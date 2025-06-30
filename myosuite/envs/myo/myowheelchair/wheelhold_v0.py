@@ -51,8 +51,7 @@ class WheelHoldFixedEnvV0(BaseV0):
                     weighted_reward_keys=weighted_reward_keys,
                     **kwargs,
         )
-        self.init_qpos[:-7] *= 0 # Use fully open as init pos
-        self.init_qpos[0] = -1.5 # place palm up
+        self.init_qpos = self.sim.model.key_qpos[0].copy() # copy the sitting + grabbing wheels keyframe
 
 
     def get_obs_vec(self):
