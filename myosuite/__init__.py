@@ -37,6 +37,12 @@ myosuite_myochal_suite = set(gym_registry_specs().keys())-myosuite_env_suite-_cu
 myosuite_env_suite  = myosuite_env_suite | myosuite_myochal_suite
 myosuite_myochal_suite = sorted(myosuite_myochal_suite)
 
+### Register MyoWheelchair Suite
+import myosuite.envs.myo.myowheelchair
+myosuite_myowheelchair_suite = set(gym_registry_specs().keys())-myosuite_env_suite-_current_gym_envs
+myosuite_env_suite  = myosuite_env_suite | myosuite_myowheelchair_suite
+myosuite_myowheelchair_suite = sorted(myosuite_myowheelchair_suite)
+
 # Register MyoDM Suite
 import myosuite.envs.myo # noqa
 import myosuite.envs.myo.myodm # noqa
