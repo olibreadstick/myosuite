@@ -14,7 +14,7 @@
     
     
 
-    <compiler angle="radian" meshdir=".." texturedir=".."/>
+    <compiler angle="radian" meshdir="../../../../simhive/myo_sim/" texturedir="../../../../simhive/myo_sim/"/>
     <size memory="10M"/>
 
     <worldbody>

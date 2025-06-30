@@ -13,4 +13,4 @@
 	url = https://github.com/vikashplus/YCB_sim.git
 [submodule "myosuite/simhive/myo_sim"]
 	path = myosuite/simhive/myo_sim
-	url = https://github.com/olibreadstick/myo_sim
+	url = https://github.com/olibreadstick/myo_sim.git
