@@ -4,20 +4,19 @@ Authors  :: Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano (caggiano@gma
 ================================================= """
 
 import collections
-from myosuite.utils import gym
 import numpy as np
+from myosuite.utils import gym
 
 from myosuite.envs.myo.base_v0 import BaseV0
 
 
+class WheelHoldFixedEnvV0(BaseV0):
 
-class ReachEnvV0(BaseV0):
-
-    DEFAULT_OBS_KEYS = ['qpos', 'qvel', 'tip_pos', 'reach_err']
+    DEFAULT_OBS_KEYS = ['hand_qpos', 'hand_qvel', 'wheel_pos', 'wheel_err']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
-        "reach": 1.0,
+        "goal_dist": 100.0,
         "bonus": 4.0,
-        "penalty": 50,
+        "penalty": 10,
     }
 
     def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
@@ -40,34 +39,30 @@ class ReachEnvV0(BaseV0):
 
 
     def _setup(self,
-            target_reach_range:dict,
-            far_th = .35,
             obs_keys:list = DEFAULT_OBS_KEYS,
-            weighted_reward_keys:dict = DEFAULT_RWD_KEYS_AND_WEIGHTS,
+            weighted_reward_keys:list = DEFAULT_RWD_KEYS_AND_WEIGHTS,
             **kwargs,
         ):
-        self.far_th = far_th
-        self.target_reach_range = target_reach_range
+        self.object_sid = self.sim.model.site_name2id("wheel")
+        self.goal_sid = self.sim.model.site_name2id("goal")
+        self.object_init_pos = self.sim.data.site_xpos[self.object_sid].copy()
+
         super()._setup(obs_keys=obs_keys,
-                weighted_reward_keys=weighted_reward_keys,
-                sites=self.target_reach_range.keys(),
-                **kwargs,
-                )
+                    weighted_reward_keys=weighted_reward_keys,
+                    **kwargs,
+        )
+        self.init_qpos[:-7] *= 0 # Use fully open as init pos
+        self.init_qpos[0] = -1.5 # place palm up
+
 
     def get_obs_vec(self):
         self.obs_dict['time'] = np.array([self.sim.data.time])
-        self.obs_dict['qpos'] = self.sim.data.qpos[:].copy()
-        self.obs_dict['qvel'] = self.sim.data.qvel[:].copy()*self.dt
+        self.obs_dict['hand_qpos'] = self.sim.data.qpos[:-7].copy()
+        self.obs_dict['hand_qvel'] = self.sim.data.qvel[:-6].copy()*self.dt
+        self.obs_dict['wheel_pos'] = self.sim.data.site_xpos[self.object_sid]
+        self.obs_dict['wheel_err'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
         if self.sim.model.na>0:
             self.obs_dict['act'] = self.sim.data.act[:].copy()
-
-        # reach error
-        self.obs_dict['tip_pos'] = np.array([])
-        self.obs_dict['target_pos'] = np.array([])
-        for isite in range(len(self.tip_sids)):
-            self.obs_dict['tip_pos'] = np.append(self.obs_dict['tip_pos'], self.sim.data.site_xpos[self.tip_sids[isite]].copy())
-            self.obs_dict['target_pos'] = np.append(self.obs_dict['target_pos'], self.sim.data.site_xpos[self.target_sids[isite]].copy())
-        self.obs_dict['reach_err'] = np.array(self.obs_dict['target_pos'])-np.array(self.obs_dict['tip_pos'])
 
         t, obs = self.obsdict2obsvec(self.obs_dict, self.obs_keys)
         return obs
@@ -75,49 +70,44 @@ class ReachEnvV0(BaseV0):
     def get_obs_dict(self, sim):
         obs_dict = {}
         obs_dict['time'] = np.array([sim.data.time])
-        obs_dict['qpos'] = sim.data.qpos[:].copy()
-        obs_dict['qvel'] = sim.data.qvel[:].copy()*self.dt
+        obs_dict['hand_qpos'] = sim.data.qpos[:-7].copy()
+        obs_dict['hand_qvel'] = sim.data.qvel[:-6].copy()*self.dt
+        obs_dict['wheel_pos'] = sim.data.site_xpos[self.object_sid]
+        obs_dict['wheel_err'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
         if sim.model.na>0:
             obs_dict['act'] = sim.data.act[:].copy()
-
-        # reach error
-        obs_dict['tip_pos'] = np.array([])
-        obs_dict['target_pos'] = np.array([])
-        for isite in range(len(self.tip_sids)):
-            obs_dict['tip_pos'] = np.append(obs_dict['tip_pos'], sim.data.site_xpos[self.tip_sids[isite]].copy())
-            obs_dict['target_pos'] = np.append(obs_dict['target_pos'], sim.data.site_xpos[self.target_sids[isite]].copy())
-        obs_dict['reach_err'] = np.array(obs_dict['target_pos'])-np.array(obs_dict['tip_pos'])
         return obs_dict
 
     def get_reward_dict(self, obs_dict):
-        reach_dist = np.linalg.norm(obs_dict['reach_err'], axis=-1)
+        goal_dist = np.abs(np.linalg.norm(self.obs_dict['wheel_err'], axis=-1)) #-0.040)
         act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
-        far_th = self.far_th*len(self.tip_sids) if np.squeeze(obs_dict['time'])>2*self.dt else np.inf
-        near_th = len(self.tip_sids)*.0125
+        gaol_th = .010
+        drop = goal_dist > 0.300
+
         rwd_dict = collections.OrderedDict((
             # Optional Keys
-            ('reach',   -1.*reach_dist),
-            ('bonus',   1.*(reach_dist<2*near_th) + 1.*(reach_dist<near_th)),
+            ('goal_dist', -1.*goal_dist),
+            ('bonus', 1.*(goal_dist<2*gaol_th) + 1.*(goal_dist<gaol_th)),
             ('act_reg', -1.*act_mag),
-            ('penalty', -1.*(reach_dist>far_th)),
+            ('penalty', -1.*drop),
             # Must keys
-            ('sparse',  -1.*reach_dist),
-            ('solved',  reach_dist<near_th),
-            ('done',    reach_dist > far_th),
+            ('sparse', -goal_dist),
+            ('solved', goal_dist<gaol_th),
+            ('done', drop),
         ))
         rwd_dict['dense'] = np.sum([wt*rwd_dict[key] for key, wt in self.rwd_keys_wt.items()], axis=0)
         return rwd_dict
 
-    # generate a valid target
-    def generate_target_pose(self):
-        for site, span in self.target_reach_range.items():
-            sid =  self.sim.model.site_name2id(site+'_target')
-            self.sim.model.site_pos[sid] = self.np_random.uniform(low=span[0], high=span[1])
-        self.sim.forward()
 
+class WheelHoldRandomEnvV0(WheelHoldFixedEnvV0):
 
     def reset(self, **kwargs):
-        self.generate_target_pose()
+        # randomize target pos
+        self.sim.model.site_pos[self.goal_sid] = self.object_init_pos + self.np_random.uniform(high=np.array([0.030, 0.030, 0.030]), low=np.array([-.030, -.030, -.030]))
+        # randomize object
+        size = self.np_random.uniform(high=np.array([0.030, 0.030, 0.030]), low=np.array([.020, .020, .020]))
+        self.sim.model.geom_size[-1] = size
+        self.sim.model.site_size[self.goal_sid] = size
         self.robot.sync_sims(self.sim, self.sim_obsd)
         obs = super().reset(**kwargs)
         return obs
