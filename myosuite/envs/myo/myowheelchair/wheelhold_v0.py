@@ -12,7 +12,7 @@ from myosuite.envs.myo.base_v0 import BaseV0
 
 class WheelHoldFixedEnvV0(BaseV0):
 
-    DEFAULT_OBS_KEYS = ['hand_qpos', 'hand_qvel', 'wheel_pos', 'wheel_err']
+    DEFAULT_OBS_KEYS = ['hand_qpos', 'hand_qvel', 'wheel_pos']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
         "goal_dist": 100.0,
         "bonus": 4.0,
@@ -44,7 +44,7 @@ class WheelHoldFixedEnvV0(BaseV0):
             **kwargs,
         ):
         self.object_sid = self.sim.model.site_name2id("wheel")
-        self.goal_sid = self.sim.model.site_name2id("goal")
+        # self.goal_sid = self.sim.model.site_name2id("goal")
         self.object_init_pos = self.sim.data.site_xpos[self.object_sid].copy()
 
         super()._setup(obs_keys=obs_keys,
@@ -59,7 +59,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.obs_dict['hand_qpos'] = self.sim.data.qpos[:-7].copy()
         self.obs_dict['hand_qvel'] = self.sim.data.qvel[:-6].copy()*self.dt
         self.obs_dict['wheel_pos'] = self.sim.data.site_xpos[self.object_sid]
-        self.obs_dict['wheel_err'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
+        # self.obs_dict['wheel_err'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
         if self.sim.model.na>0:
             self.obs_dict['act'] = self.sim.data.act[:].copy()
 
@@ -72,7 +72,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         obs_dict['hand_qpos'] = sim.data.qpos[:-7].copy()
         obs_dict['hand_qvel'] = sim.data.qvel[:-6].copy()*self.dt
         obs_dict['wheel_pos'] = sim.data.site_xpos[self.object_sid]
-        obs_dict['wheel_err'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+        # obs_dict['wheel_err'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
         if sim.model.na>0:
             obs_dict['act'] = sim.data.act[:].copy()
         return obs_dict
@@ -98,15 +98,15 @@ class WheelHoldFixedEnvV0(BaseV0):
         return rwd_dict
 
 
-class WheelHoldRandomEnvV0(WheelHoldFixedEnvV0):
+# class WheelHoldRandomEnvV0(WheelHoldFixedEnvV0):
 
-    def reset(self, **kwargs):
-        # randomize target pos
-        self.sim.model.site_pos[self.goal_sid] = self.object_init_pos + self.np_random.uniform(high=np.array([0.030, 0.030, 0.030]), low=np.array([-.030, -.030, -.030]))
-        # randomize object
-        size = self.np_random.uniform(high=np.array([0.030, 0.030, 0.030]), low=np.array([.020, .020, .020]))
-        self.sim.model.geom_size[-1] = size
-        self.sim.model.site_size[self.goal_sid] = size
-        self.robot.sync_sims(self.sim, self.sim_obsd)
-        obs = super().reset(**kwargs)
-        return obs
+#     def reset(self, **kwargs):
+#         # randomize target pos
+#         self.sim.model.site_pos[self.goal_sid] = self.object_init_pos + self.np_random.uniform(high=np.array([0.030, 0.030, 0.030]), low=np.array([-.030, -.030, -.030]))
+#         # randomize object
+#         size = self.np_random.uniform(high=np.array([0.030, 0.030, 0.030]), low=np.array([.020, .020, .020]))
+#         self.sim.model.geom_size[-1] = size
+#         self.sim.model.site_size[self.goal_sid] = size
+#         self.robot.sync_sims(self.sim, self.sim_obsd)
+#         obs = super().reset(**kwargs)
+#         return obs
