@@ -44,7 +44,8 @@ class WheelHoldFixedEnvV0(BaseV0):
             **kwargs,
         ):
         self.object_sid = self.sim.model.site_name2id("wheel")
-        # self.goal_sid = self.sim.model.site_name2id("goal")
+        self.goal_sid_right = self.sim.model.site_name2id("wheel_grip_goal_right")
+        #self.goal_sid_left = self.sim.model.site_name2id("wheel_grip_goal_left")
         self.object_init_pos = self.sim.data.site_xpos[self.object_sid].copy()
 
         super()._setup(obs_keys=obs_keys,
@@ -59,7 +60,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.obs_dict['hand_qpos'] = self.sim.data.qpos[:-7].copy()
         self.obs_dict['hand_qvel'] = self.sim.data.qvel[:-6].copy()*self.dt
         self.obs_dict['wheel_pos'] = self.sim.data.site_xpos[self.object_sid]
-        # self.obs_dict['wheel_err'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
+        self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
+        #self.obs_dict['wheel_err_left'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
         if self.sim.model.na>0:
             self.obs_dict['act'] = self.sim.data.act[:].copy()
 
@@ -72,30 +74,42 @@ class WheelHoldFixedEnvV0(BaseV0):
         obs_dict['hand_qpos'] = sim.data.qpos[:-7].copy()
         obs_dict['hand_qvel'] = sim.data.qvel[:-6].copy()*self.dt
         obs_dict['wheel_pos'] = sim.data.site_xpos[self.object_sid]
-        # obs_dict['wheel_err'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+        obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+        #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
         if sim.model.na>0:
             obs_dict['act'] = sim.data.act[:].copy()
         return obs_dict
 
     def get_reward_dict(self, obs_dict):
-        goal_dist = np.abs(np.linalg.norm(self.obs_dict['wheel_err'], axis=-1)) #-0.040)
-        act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
-        gaol_th = .010
-        drop = goal_dist > 0.300
+        dist_right = np.linalg.norm(obs_dict['wheel_err_right'])
+        
+        grip_right = self._check_hand_grip_contact(
+            hand_geom_names=["right_index_tip", "right_thumb_tip"],
+            wheel_geom_names=[f"handrail_coll{i}" for i in range(1, 17)]
+        )
 
         rwd_dict = collections.OrderedDict((
-            # Optional Keys
-            ('goal_dist', -1.*goal_dist),
-            ('bonus', 1.*(goal_dist<2*gaol_th) + 1.*(goal_dist<gaol_th)),
-            ('act_reg', -1.*act_mag),
-            ('penalty', -1.*drop),
-            # Must keys
-            ('sparse', -goal_dist),
-            ('solved', goal_dist<gaol_th),
-            ('done', drop),
+            ('goal_dist', -dist_right),
+            ('grip_bonus', 1.0 * grip_right),
+            ('sparse', 1.0 * grip_right - dist_right),
+            ('solved', grip_right and dist_right < 0.015),
+            ('done', dist_right > 0.5),
         ))
-        rwd_dict['dense'] = np.sum([wt*rwd_dict[key] for key, wt in self.rwd_keys_wt.items()], axis=0)
+
+        rwd_dict['dense'] = 5.0 * rwd_dict['grip_bonus'] + 1.0 * rwd_dict['goal_dist']
         return rwd_dict
+
+    def _check_hand_grip_contact(self, hand_geom_names, wheel_geom_names):
+        hand_geom_ids = [self.sim.model.geom_name2id(n) for n in hand_geom_names]
+        wheel_geom_ids = [self.sim.model.geom_name2id(n) for n in wheel_geom_names]
+        
+        for i in range(self.sim.data.ncon):
+            contact = self.sim.data.contact[i]
+            if (contact.geom1 in hand_geom_ids and contact.geom2 in wheel_geom_ids) or \
+            (contact.geom2 in hand_geom_ids and contact.geom1 in wheel_geom_ids):
+                return True
+        return False
+
 
 
 # class WheelHoldRandomEnvV0(WheelHoldFixedEnvV0):
