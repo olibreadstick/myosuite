@@ -12,7 +12,7 @@ from myosuite.envs.myo.base_v0 import BaseV0
 
 class WheelHoldFixedEnvV0(BaseV0):
 
-    DEFAULT_OBS_KEYS = ['wheel_err_right']
+    DEFAULT_OBS_KEYS = ['wheel_err_right', 'hand_qpos', 'hand_qvel']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
         "goal_dist": 100.0,
         "bonus": 4.0,
@@ -45,6 +45,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         ):
         #self.object_sid = self.sim.model.site_name2id("wheel")
         self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
+        self.palm_r = self.sim.model.site_name2id("palm_r")
+
         #self.goal_sid_left = self.sim.model.site_name2id("wheel_grip_goal_left")
         #self.object_init_pos = self.sim.data.site_xpos[self.object_sid].copy()
 
@@ -52,15 +54,16 @@ class WheelHoldFixedEnvV0(BaseV0):
                     weighted_reward_keys=weighted_reward_keys,
                     **kwargs,
         )
+        
         self.init_qpos = self.sim.model.key_qpos[0].copy() # copy the sitting + grabbing wheels keyframe
 
 
     def get_obs_vec(self):
         self.obs_dict['time'] = np.array([self.sim.data.time])
-        #self.obs_dict['hand_qpos'] = self.sim.data.qpos[:-7].copy()
-        #self.obs_dict['hand_qvel'] = self.sim.data.qvel[:-6].copy()*self.dt
+        self.obs_dict['hand_qpos'] = self.sim.data.qpos[7:].copy()
+        self.obs_dict['hand_qvel'] = self.sim.data.qvel[6:].copy()*self.dt
         #self.obs_dict['wheel_pos'] = self.sim.data.site_xpos[self.object_sid]
-        self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.hand_pos]
+        self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
         #self.obs_dict['wheel_err_left'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
         #self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
         # if self.sim.model.na>0:
@@ -72,11 +75,11 @@ class WheelHoldFixedEnvV0(BaseV0):
     def get_obs_dict(self, sim):
         obs_dict = {}
         obs_dict['time'] = np.array([sim.data.time])
-        #obs_dict['hand_qpos'] = sim.data.qpos[:-7].copy()
-        #obs_dict['hand_qvel'] = sim.data.qvel[:-6].copy()*self.dt
+        obs_dict['hand_qpos'] = sim.data.qpos[13:].copy()
+        obs_dict['hand_qvel'] = sim.data.qvel[14:].copy()*self.dt
         #obs_dict['wheel_pos'] = sim.data.site_xpos[self.object_sid]
         #obs_dict['wheelchair_grip_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
-        obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+        obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid_right] - sim.data.site_xpos[self.palm_r]
         #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
         return obs_dict
 
@@ -91,9 +94,11 @@ class WheelHoldFixedEnvV0(BaseV0):
         rwd_dict = collections.OrderedDict((
             ('goal_dist', -dist_right),
             #('grip_bonus', 1.0 * grip_right),
-            ('sparse', 1.0 * grip_right - dist_right),
-            ('solved', grip_right and dist_right < 0.015),
-            ('done', dist_right > 0.5),
+            ('sparse', 1.0 * -dist_right),
+            #('sparse', 1.0 * grip_right - dist_right),
+            ('solved', dist_right < 0.015),
+            #('solved', grip_right and dist_right < 0.015),
+            ('done', dist_right < 0.001),
         ))
         
         rwd_dict['dense'] = 1.0 * rwd_dict['goal_dist']
@@ -102,16 +107,16 @@ class WheelHoldFixedEnvV0(BaseV0):
         #rwd_dict['dense'] = 5.0 * rwd_dict['grip_bonus'] + 1.0 * rwd_dict['goal_dist']
         return rwd_dict
 
-    def _check_hand_grip_contact(self, hand_geom_names, wheel_geom_names):
-        hand_geom_ids = [self.sim.model.geom_name2id(n) for n in hand_geom_names]
-        wheel_geom_ids = [self.sim.model.geom_name2id(n) for n in wheel_geom_names]
+    # def _check_hand_grip_contact(self, hand_geom_names, wheel_geom_names):
+    #     hand_geom_ids = [self.sim.model.geom_name2id(n) for n in hand_geom_names]
+    #     wheel_geom_ids = [self.sim.model.geom_name2id(n) for n in wheel_geom_names]
         
-        for i in range(self.sim.data.ncon):
-            contact = self.sim.data.contact[i]
-            if (contact.geom1 in hand_geom_ids and contact.geom2 in wheel_geom_ids) or \
-            (contact.geom2 in hand_geom_ids and contact.geom1 in wheel_geom_ids):
-                return True
-        return False
+    #     for i in range(self.sim.data.ncon):
+    #         contact = self.sim.data.contact[i]
+    #         if (contact.geom1 in hand_geom_ids and contact.geom2 in wheel_geom_ids) or \
+    #         (contact.geom2 in hand_geom_ids and contact.geom1 in wheel_geom_ids):
+    #             return True
+    #     return False
 
 
 

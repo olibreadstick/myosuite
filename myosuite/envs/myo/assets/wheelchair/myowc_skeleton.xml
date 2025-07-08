@@ -18,7 +18,7 @@
     <size memory="10M"/>
 
     <worldbody>
-        <body name="wheelchair" pos="0 -1 0">
+        <body name="wheelchair" pos="0 0 0">
             <freejoint name="wheelchair"/>
             <include file="../../../../simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml"/>
             <body name="skele" pos="-0.22 -0.35 0.51" euler="0 0 0">
