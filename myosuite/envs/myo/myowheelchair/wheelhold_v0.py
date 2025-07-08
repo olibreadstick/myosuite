@@ -76,6 +76,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         obs_dict['wheel_pos'] = sim.data.site_xpos[self.object_sid]
         obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
         #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+        #KJSKHFKJSJFLJZKBKJSOJHJJNSKJHFHS
         if sim.model.na>0:
             obs_dict['act'] = sim.data.act[:].copy()
         return obs_dict
