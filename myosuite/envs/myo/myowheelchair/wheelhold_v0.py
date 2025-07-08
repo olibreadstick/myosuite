@@ -62,6 +62,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.obs_dict['wheel_pos'] = self.sim.data.site_xpos[self.object_sid]
         self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
         #self.obs_dict['wheel_err_left'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
+        self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
         if self.sim.model.na>0:
             self.obs_dict['act'] = self.sim.data.act[:].copy()
 
@@ -74,11 +75,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         obs_dict['hand_qpos'] = sim.data.qpos[:-7].copy()
         obs_dict['hand_qvel'] = sim.data.qvel[:-6].copy()*self.dt
         obs_dict['wheel_pos'] = sim.data.site_xpos[self.object_sid]
-        obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+        obs_dict['wheelchair_grip_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
         #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
-        #KJSKHFKJSJFLJZKBKJSOJHJJNSKJHFHS
-        if sim.model.na>0:
-            obs_dict['act'] = sim.data.act[:].copy()
         return obs_dict
 
     def get_reward_dict(self, obs_dict):
