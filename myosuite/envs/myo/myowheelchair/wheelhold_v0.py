@@ -66,8 +66,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
         #self.obs_dict['wheel_err_left'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
         #self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
-        # if self.sim.model.na>0:
-        #     self.obs_dict['act'] = self.sim.data.act[:].copy()
+        if self.sim.model.na>0:
+            self.obs_dict['act'] = self.sim.data.act[:].copy()
 
         t, obs = self.obsdict2obsvec(self.obs_dict, self.obs_keys)
         return obs
@@ -81,10 +81,15 @@ class WheelHoldFixedEnvV0(BaseV0):
         #obs_dict['wheelchair_grip_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
         obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid_right] - sim.data.site_xpos[self.palm_r]
         #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+        if sim.model.na>0:
+            obs_dict['act'] = sim.data.act[:].copy()
+        
         return obs_dict
 
     def get_reward_dict(self, obs_dict):
         dist_right = np.linalg.norm(obs_dict['wheel_err_right'])
+        act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
+
         
         # grip_right = self._check_hand_grip_contact(
         #     hand_geom_names=["right_index_tip", "right_thumb_tip"],
@@ -93,6 +98,7 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         rwd_dict = collections.OrderedDict((
             ('goal_dist', -dist_right),
+            ('act_reg', -1.*act_mag),
             #('grip_bonus', 1.0 * grip_right),
             ('sparse', 1.0 * -dist_right),
             #('sparse', 1.0 * grip_right - dist_right),

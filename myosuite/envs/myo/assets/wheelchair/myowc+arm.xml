@@ -14,14 +14,11 @@
     <include file="../../../../simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myolegs_assets_for_wc.xml"/>
     <include file="../../../../simhive/myo_sim/wheelchair/assets/myowheelchair_assets.xml"/>
     
-
-
     <compiler angle="radian" meshdir="../../../../simhive/myo_sim/" texturedir="../../../../simhive/myo_sim/"/>
     <size memory="10M"/>
 
-
     <worldbody>
-        <body name="wheelchair" pos="0.5 -0.78 0">
+        <body name="wheelchair" pos="0 0 0">
             <freejoint name="wheelchair"/>
             <include file="../../../../simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml"/>
             <body name="skele" pos="-0.22 -0.35 0.51" euler="0 0 -1.57">

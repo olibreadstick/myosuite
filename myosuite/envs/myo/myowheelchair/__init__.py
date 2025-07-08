@@ -29,7 +29,7 @@ register_env_with_variants(id='myoHandWheelHoldFixed-v0',
         entry_point='myosuite.envs.myo.myowheelchair.wheelhold_v0:WheelHoldFixedEnvV0',
         max_episode_steps=75,
         kwargs={
-            'model_path': curr_dir+'/../assets/wheelchair/myowheelchair+FIXED_jnts+arm.xml',
+            'model_path': curr_dir+'/../assets/wheelchair/myowc+arm.xml',
             'normalize_act': True
         }
     )
