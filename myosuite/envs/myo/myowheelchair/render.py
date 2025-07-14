@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # render
     frames = []
     for _ in range(300):
-        frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=3)) #camera id 3 is focused on hand
+        frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=4)) 
         o = env.get_obs()
         a = pi.predict(o)[0]
         next_o, r, done, *_, ifo = env.step(

@@ -100,7 +100,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         # )
 
         rwd_dict = collections.OrderedDict((
-            ('goal_dist', math.exp(-0.5*abs(dist_right))), #exp(- k * abs(x))
+            ('goal_dist', math.exp(-2.0*abs(dist_right))), #exp(- k * abs(x))
             ('bonus', 1.*(dist_right<2*0) + 1.*(dist_right<0)),
             ('act_reg', -1.*act_mag),
             #('grip_bonus', 1.0 * grip_right),
