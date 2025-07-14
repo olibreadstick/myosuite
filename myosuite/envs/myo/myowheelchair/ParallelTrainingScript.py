@@ -17,7 +17,9 @@ def make_env(env_name, idx, seed=0):
         return env
     return _init
 
-def record_video(env_name, model_path="WheelDist_policy", out_path="videos/RockPose.mp4"):
+curr_dir = os.path.dirname(os.path.abspath(__file__))
+
+def record_video(env_name, model_path=curr_dir+'/WheelDist_policy', out_path=curr_dir+"/videos/Wheel_MinDist.mp4"):
     env = gym.make(env_name)
     env.reset()
     model = PPO.load(model_path)
@@ -32,7 +34,7 @@ def record_video(env_name, model_path="WheelDist_policy", out_path="videos/RockP
 
 if __name__ == "__main__":
     import multiprocessing
-    multiprocessing.set_start_method("fork", force=True)
+    multiprocessing.set_start_method("spawn", force=True)
 
     num_cpu = 8
     env_name = 'myoHandWheelHoldFixed-v0'
@@ -52,8 +54,10 @@ if __name__ == "__main__":
     print("Begin training")
     model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001, policy_kwargs=policy_kwargs)
     callback = CallbackList([eval_callback])
-    model.learn(total_timesteps=500, tb_log_name=env_name + "_" + time_now, callback=callback)
-    model.save("WheelDist_policy")
+
+    ### MODIFY TOTAL TIMESTEPS HERE ###
+    model.learn(total_timesteps=1e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.save(curr_dir+'/WheelDist_policy')
 
     # Record video after training
     record_video(env_name)
@@ -73,5 +77,3 @@ if __name__ == "__main__":
     all_rewards.append(np.sum(ep_rewards))
     print("All episode rewards:", all_rewards)
     print(f"Average reward: {np.mean(all_rewards)} over 5 episodes")
-    all_rewards
-    
