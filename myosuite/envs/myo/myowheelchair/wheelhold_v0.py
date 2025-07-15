@@ -15,7 +15,8 @@ class WheelHoldFixedEnvV0(BaseV0):
 
     DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'hand_qpos', 'hand_qvel']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
-        "goal_dist": 100.0,
+        "goal_dist": 50.0,
+        "hand_dist" : 50.0,
         "bonus": 0.0,
         "penalty": 10,
     }
@@ -44,9 +45,9 @@ class WheelHoldFixedEnvV0(BaseV0):
             weighted_reward_keys:list = DEFAULT_RWD_KEYS_AND_WEIGHTS,
             **kwargs,
         ):
-        #self.object_sid = self.sim.model.site_name2id("wheel")
         self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
         self.palm_r = self.sim.model.site_name2id("palm_r")
+        self.hand_start_right = self.sim.model.site_name2id("hand_start_right")
 
         #self.goal_sid_left = self.sim.model.site_name2id("wheel_grip_goal_left")
         #self.object_init_pos = self.sim.data.site_xpos[self.object_sid].copy()
@@ -65,8 +66,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:].copy()*self.dt
         #self.obs_dict['wheel_pos'] = self.sim.data.site_xpos[self.object_sid]
         self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
-        #self.obs_dict['wheel_err_left'] = self.sim.data.site_xpos[self.goal_sid] - self.sim.data.site_xpos[self.object_sid]
-        #self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
+        self.obs_dict['hand_initpos_err_right'] = self.sim.data.site_xpos[self.hand_start_right]- self.sim.data.site_xpos[self.goal_sid_right]
+
         if self.sim.model.na>0:
             self.obs_dict['act'] = self.sim.data.act[:].copy()
 
@@ -81,6 +82,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         #obs_dict['wheel_pos'] = sim.data.site_xpos[self.object_sid]
         #obs_dict['wheelchair_grip_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
         obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid_right] - sim.data.site_xpos[self.palm_r]
+        obs_dict['hand_initpos_err_right'] = sim.data.site_xpos[self.hand_start_right]- sim.data.site_xpos[self.goal_sid_right]
         #add the initial and end target points
         #could add the fingertips here,
         #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
@@ -91,6 +93,8 @@ class WheelHoldFixedEnvV0(BaseV0):
 
     def get_reward_dict(self, obs_dict):
         dist_right = np.linalg.norm(obs_dict['wheel_err_right'])
+        hand_initpos_err_right = np.linalg.norm(obs_dict['hand_initpos_err_right'])
+        
         act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
         drop = dist_right > 0.300
         
@@ -101,6 +105,7 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         rwd_dict = collections.OrderedDict((
             ('goal_dist', math.exp(-2.0*abs(dist_right))), #exp(- k * abs(x))
+            ('hand_dist', math.exp(-2.0*abs(hand_initpos_err_right))),
             ('bonus', 1.*(dist_right<2*0) + 1.*(dist_right<0)),
             ('act_reg', -1.*act_mag),
             #('grip_bonus', 1.0 * grip_right),
