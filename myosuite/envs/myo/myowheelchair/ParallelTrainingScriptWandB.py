@@ -127,6 +127,7 @@ if __name__ == "__main__":
         }
         #config = {**config, **envs.rwd_keys_wt}
         run = wandb.init(project="myoHandWheelHoldFixed-v0",
+                        entity="oliviacardillo-mcgill-university",
                         group=args.group,
                         settings=wandb.Settings(start_method="thread"),
                         config=config,
@@ -165,7 +166,7 @@ if __name__ == "__main__":
     #TODO TOTAL TIMESTEPS HERE
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
-    model.learn(total_timesteps=1e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.learn(total_timesteps=100, tb_log_name=env_name + "_" + time_now, callback=callback)
     model.save(curr_dir+'/WheelDist_policy')
 
     # Record video after training
