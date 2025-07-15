@@ -70,17 +70,17 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
 
 
 class TensorboardCallback(BaseCallback):
-	"""
-	Custom callback for plotting additional values in tensorboard.
-	"""
-	def __init__(self, verbose=0):
-	    super(TensorboardCallback, self).__init__(verbose)
-	def _on_step(self) -> bool:
-	    # Log scalar value (here a random variable)
-	    value = self.training_env.get_obs_vec()
-	    self.logger.record("obs", value)
-	
-	    return True
+    """
+    Custom callback for plotting additional values in tensorboard.
+    """
+    def __init__(self, verbose=0):
+        super(TensorboardCallback, self).__init__(verbose)
+    def _on_step(self) -> bool:
+        # Log scalar value (here a random variable)
+        value = self.training_env.get_obs_vec()
+        self.logger.record("obs", value)
+
+        return True
 
 
 if __name__ == "__main__":
@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     dof_env = ['myoHandWheelHoldFixed-v0']
 
-    training_steps = 8000000
+    training_steps = 5e5
     #wandb
     for env_name in dof_env:
         print('Begin training')
@@ -162,15 +162,11 @@ if __name__ == "__main__":
 
     callback = CallbackList([eval_callback])
 
-    ### MODIFY TOTAL TIMESTEPS HERE ###
-    model.learn(total_timesteps=100, tb_log_name=env_name + "_" + time_now, callback=callback)
-    model.save(curr_dir+'/WheelDist_policy')
-
+    #TODO TOTAL TIMESTEPS HERE
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
-    model.learn(total_timesteps=1000000, tb_log_name=env_name + "_" + time_now, callback=callback)
-    model.save("WheelDist_policy")
-
+    model.learn(total_timesteps=1e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.save(curr_dir+'/WheelDist_policy')
 
     # Record video after training
     record_video(env_name)
