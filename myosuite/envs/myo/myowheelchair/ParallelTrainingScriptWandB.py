@@ -10,6 +10,7 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback
 from wandb.integration.sb3 import WandbCallback
 import skvideo.io
+from typing import Callable, Dict, List, Optional, Tuple, Type, Union
 
 import argparse
 parser = argparse.ArgumentParser(description="Main script to train an agent")
@@ -90,6 +91,7 @@ if __name__ == "__main__":
 
     dof_env = ['myoHandWheelHoldFixed-v0']
 
+    training_steps = 8000000
     #wandb
     for env_name in dof_env:
         print('Begin training')
@@ -161,7 +163,7 @@ if __name__ == "__main__":
     callback = CallbackList([eval_callback])
 
     ### MODIFY TOTAL TIMESTEPS HERE ###
-    model.learn(total_timesteps=1e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.learn(total_timesteps=100, tb_log_name=env_name + "_" + time_now, callback=callback)
     model.save(curr_dir+'/WheelDist_policy')
 
     obs_callback = TensorboardCallback()
