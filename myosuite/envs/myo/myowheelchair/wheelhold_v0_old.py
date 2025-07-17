@@ -15,11 +15,10 @@ class WheelHoldFixedEnvV0(BaseV0):
 
     DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'hand_qpos', 'hand_qvel']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
-        "goal_dist": 150.0,
+        "goal_dist": 50.0,
         "hand_dist" : 50.0,
-        "fin_open": -15.0,
         "bonus": 0.0,
-        "penalty": 20,
+        "penalty": 10,
     }
 
     def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
@@ -47,17 +46,8 @@ class WheelHoldFixedEnvV0(BaseV0):
             **kwargs,
         ):
         self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
-        # self.palm_r = self.sim.model.site_name2id("palm_r")
+        self.palm_r = self.sim.model.site_name2id("palm_r")
         self.hand_start_right = self.sim.model.site_name2id("hand_start_right")
-
-        # define the palm and tip site id.
-        self.palm_r = self.sim.model.site_name2id('S_grasp')
-        self.init_palm_z = self.sim.data.site_xpos[self.palm_r][-1]
-        self.fin0 = self.sim.model.site_name2id("THtip")
-        self.fin1 = self.sim.model.site_name2id("IFtip")
-        self.fin2 = self.sim.model.site_name2id("MFtip")
-        self.fin3 = self.sim.model.site_name2id("RFtip")
-        self.fin4 = self.sim.model.site_name2id("LFtip")
 
         #self.goal_sid_left = self.sim.model.site_name2id("wheel_grip_goal_left")
         #self.object_init_pos = self.sim.data.site_xpos[self.object_sid].copy()
@@ -78,13 +68,6 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
         self.obs_dict['hand_initpos_err_right'] = self.sim.data.site_xpos[self.hand_start_right]- self.sim.data.site_xpos[self.goal_sid_right]
 
-        self.obs_dict["palm_pos"] = self.sim.data.site_xpos[self.palm_r]
-        self.obs_dict['fin0'] = self.sim.data.site_xpos[self.fin0]
-        self.obs_dict['fin1'] = self.sim.data.site_xpos[self.fin1]
-        self.obs_dict['fin2'] = self.sim.data.site_xpos[self.fin2]
-        self.obs_dict['fin3'] = self.sim.data.site_xpos[self.fin3]
-        self.obs_dict['fin4'] = self.sim.data.site_xpos[self.fin4]
-
         if self.sim.model.na>0:
             self.obs_dict['act'] = self.sim.data.act[:].copy()
 
@@ -102,13 +85,6 @@ class WheelHoldFixedEnvV0(BaseV0):
         obs_dict['hand_initpos_err_right'] = sim.data.site_xpos[self.hand_start_right]- sim.data.site_xpos[self.goal_sid_right]
         #add the initial and end target points
         #could add the fingertips here,
-        obs_dict["palm_pos"] = sim.data.site_xpos[self.palm_r]
-        obs_dict['fin0'] = sim.data.site_xpos[self.fin0]
-        obs_dict['fin1'] = sim.data.site_xpos[self.fin1]
-        obs_dict['fin2'] = sim.data.site_xpos[self.fin2]
-        obs_dict['fin3'] = sim.data.site_xpos[self.fin3]
-        obs_dict['fin4'] = sim.data.site_xpos[self.fin4]
-
         #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
         if sim.model.na>0:
             obs_dict['act'] = sim.data.act[:].copy()
@@ -121,14 +97,6 @@ class WheelHoldFixedEnvV0(BaseV0):
         
         act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
         drop = dist_right > 0.300
-
-        fin_keys = ['fin0', 'fin1', 'fin2', 'fin3', 'fin4']
-        # for fin in fin_keys:
-        #     print(fin, type(obs_dict[fin]), np.shape(obs_dict[fin]))
-        fin_open = sum(
-            np.linalg.norm(obs_dict[fin].squeeze() - obs_dict['palm_pos'].squeeze(), axis=-1)
-            for fin in fin_keys
-        )
         
         # grip_right = self._check_hand_grip_contact(
         #     hand_geom_names=["right_index_tip", "right_thumb_tip"],
@@ -140,8 +108,6 @@ class WheelHoldFixedEnvV0(BaseV0):
             ('hand_dist', math.exp(-2.0*abs(hand_initpos_err_right))),
             ('bonus', 1.*(dist_right<2*0) + 1.*(dist_right<0)),
             ('act_reg', -1.*act_mag),
-            ("fin_open", np.exp(-5 * fin_open)),  # fin_open + np.log(fin_open +1e-8)
-
             #('grip_bonus', 1.0 * grip_right),
             ('penalty', -1.*drop),
             ('sparse', dist_right < 0.055),
