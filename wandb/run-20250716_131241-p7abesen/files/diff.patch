@@ -1,0 +1,65 @@
+warning: in the working copy of 'myosuite/envs/myo/myowheelchair/TESTING.ipynb', LF will be replaced by CRLF the next time Git touches it
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index abd5b86..7e9bd74 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -166,7 +166,7 @@ if __name__ == "__main__":
+     #TODO TOTAL TIMESTEPS HERE
+     obs_callback = TensorboardCallback()
+     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
+-    model.learn(total_timesteps=100, tb_log_name=env_name + "_" + time_now, callback=callback)
++    model.learn(total_timesteps=1e6, tb_log_name=env_name + "_" + time_now, callback=callback)
+     model.save(curr_dir+'/WheelDist_policy')
+ 
+     # Record video after training
+diff --git a/myosuite/envs/myo/myowheelchair/TESTING.ipynb b/myosuite/envs/myo/myowheelchair/TESTING.ipynb
+index 7b432c8..1a36735 100644
+--- a/myosuite/envs/myo/myowheelchair/TESTING.ipynb
++++ b/myosuite/envs/myo/myowheelchair/TESTING.ipynb
+@@ -50,7 +50,7 @@
+   },
+   {
+    "cell_type": "code",
+-   "execution_count": 4,
++   "execution_count": 2,
+    "metadata": {},
+    "outputs": [
+     {
+@@ -66,7 +66,7 @@
+     {
+      "data": {
+       "text/plain": [
+-       "(array([ 0.    ,  0.0278,  0.0025, -0.0237, -0.75  ,  0.1511, -0.    ,\n",
++       "(array([ 0.    ,  0.0278,  0.0031, -0.0236, -0.75  ,  0.1511, -0.    ,\n",
+        "         0.    , -0.152 ,  0.6447,  0.    , -0.552 , -0.3131,  0.    ,\n",
+        "        -0.3817,  0.2514, -0.37  ,  2.094 ,  1.1118,  0.1257,  0.1828,\n",
+        "        -0.1414,  0.6968, -0.5062,  0.3569,  0.    ,  0.7462,  0.0262,\n",
+@@ -90,7 +90,7 @@
+        " {})"
+       ]
+      },
+-     "execution_count": 4,
++     "execution_count": 2,
+      "metadata": {},
+      "output_type": "execute_result"
+     }
+diff --git a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip
+deleted file mode 100644
+index 7efd8be..0000000
+Binary files a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip and /dev/null differ
+diff --git a/myosuite/envs/myo/myowheelchair/videos/RockPose.mp4 b/myosuite/envs/myo/myowheelchair/videos/RockPose.mp4
+index 324f974..2750b5c 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/RockPose.mp4 and b/myosuite/envs/myo/myowheelchair/videos/RockPose.mp4 differ
+Submodule myosuite/simhive/myo_sim 3522f4d..4c56b80:
+diff --git a/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml b/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
+index 3358e03..d0205cb 100644
+--- a/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
++++ b/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
+@@ -40,6 +40,7 @@
+             <!-- <site name="wheel" size="0.005"/>  -->
+             <site name="wheelchair_grip_left" pos="-0.0371 0.27 0.05" size="0.005" rgba="0 1 0 0.5"/>
+         </body>
++        <site name="hand_start_right" pos="0.5324 -0.3142 -0.1024" size="0.008" rgba="1 0 0 1"/>
+         <body name = "right_rear_wheel" pos="0.4953 -0.5842 -0.1524">
+             <joint name= "right_rear" axis="-1 0 0" damping=".03"/>
+             <geom mesh= "rear_wheel2" pos="-0.4953 0.5842 0.1524" material="dark_grey" conaffinity="0" contype="0"/>
