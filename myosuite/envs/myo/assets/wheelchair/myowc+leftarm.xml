@@ -11,7 +11,10 @@
     <include file="../../../../simhive/myo_sim/scene/myosuite_scene_noPedestal.xml"/>
     <include file="../../../../simhive/myo_sim/wheelchairandhuman/assets/myotorso_abdomen_assets.xml"/>
     <include file="../../../../simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_assets_for_wc.xml"/>
+    <!-- 
     <include file="../../../../simhive/myo_sim/arm/assets/myoarm_body_left.xml"/>
+    
+    -->
     <include file="../../../../simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myolegs_assets_for_wc.xml"/>
     <include file="../../../../simhive/myo_sim/wheelchair/assets/myowheelchair_assets.xml"/>
     
@@ -24,7 +27,7 @@
             <freejoint name="wheelchair"/>
             <include file="../../../../simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml"/>
             <body name="skele" pos="-0.22 -0.35 0.51" euler="0 0 -1.57">
-                <include file="../../../../simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myotorso_abdomen_chain+leftarm.xml"/>
+                <include file="../../../../simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myotorso_abdomen_chain+armleft.xml"/>
                 <include file="../../../../simhive/myo_sim/wheelchairandhuman/assets/myolegs_chain.xml"/>
             </body>
         </body>
