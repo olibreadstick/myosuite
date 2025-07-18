@@ -1,0 +1,202 @@
+_current_progress_remaining:
+    value: 0.770624
+_custom_logger:
+    value: "False"
+_episode_num:
+    value: 0
+_last_episode_starts:
+    value: '[ True  True  True  True  True  True  True  True  True]'
+_last_obs:
+    value: |-
+        [[0.         0.03392218 0.02290983 ... 0.         0.         0.        ]
+         [0.         0.03392218 0.02290983 ... 0.         0.         0.        ]
+         [0.         0.03392218 0.02290983 ... 0.         0.         0.        ]
+         ...
+         [0.         0.03392218 0.02290983 ... 0.         0.         0.        ]
+         [0.         0.03392218 0.02290983 ... 0.         0.         0.        ]
+         [0.         0.03392218 0.02290983 ... 0.         0.         0.        ]]
+_last_original_obs:
+    value: None
+_logger:
+    value: <stable_baselines3.common.logger.Logger object at 0x000001C92E64C190>
+_n_updates:
+    value: 140
+_num_timesteps_at_start:
+    value: 0
+_stats_window_size:
+    value: 100
+_total_timesteps:
+    value: 500000
+_vec_normalize_env:
+    value: None
+_wandb:
+    value:
+        cli_version: 0.21.0
+        code_path: code/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+        e:
+            xoshrvn3fg9sp2k7jw4f84qm53mwn8if:
+                codePath: myosuite\envs\myo\myowheelchair\ParallelTrainingScriptWandB.py
+                codePathLocal: myosuite\envs\myo\myowheelchair\ParallelTrainingScriptWandB.py
+                cpu_count: 8
+                cpu_count_logical: 16
+                disk:
+                    /:
+                        total: "1021821579264"
+                        used: "263309938688"
+                email: jasmine.jh.wang04@gmail.com
+                executable: C:\Users\jasmi\miniconda3\envs\MyoSuite\python.exe
+                git:
+                    commit: f14784ac490ba86efe3254cc19622afe34ea171b
+                    remote: https://github.com/olibreadstick/myosuite.git
+                host: Jas-P14S
+                memory:
+                    total: "29706903552"
+                os: Windows-10-10.0.26100-SP0
+                program: c:/Users/jasmi/Documents/GitHub/myosuite/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+                python: CPython 3.8.20
+                root: C:\Users\jasmi\Documents\GitHub\myosuite
+                startedAt: "2025-07-18T20:37:48.936926Z"
+                writerId: xoshrvn3fg9sp2k7jw4f84qm53mwn8if
+        m: []
+        python_version: 3.8.20
+        t:
+            "1":
+                - 1
+            "2":
+                - 1
+            "3":
+                - 1
+                - 16
+                - 22
+                - 35
+            "4": 3.8.20
+            "5": 0.21.0
+            "8":
+                - 3
+            "12": 0.21.0
+            "13": windows-amd64
+CR:
+    value: 0.2
+action_noise:
+    value: None
+action_space:
+    value: Box(-1.0, 1.0, (63,), float32)
+activation:
+    value: relu
+algo:
+    value: PPO
+batch_size:
+    value: 64
+clip_range:
+    value: <function get_schedule_fn.<locals>.<lambda> at 0x000001C931038700>
+clip_range_vf:
+    value: None
+dense_units:
+    value: 512
+device:
+    value: cpu
+ent_coef:
+    value: 0.001
+ent_coeff:
+    value: 0.01
+entropy:
+    value: 0.01
+env:
+    value: <stable_baselines3.common.vec_env.subproc_vec_env.SubprocVecEnv object at 0x000001C92E5DE5B0>
+env_name:
+    value: myoHandWheelHoldFixed-v0
+ep_info_buffer:
+    value: deque([], maxlen=100)
+ep_success_buffer:
+    value: deque([], maxlen=100)
+gae_lambda:
+    value: 0.95
+gamma:
+    value: 0.99
+learning_rate:
+    value: 0.0003
+loaded_model:
+    value: NA
+lr:
+    value: 0.0005
+lr_schedule:
+    value: <function get_schedule_fn.<locals>.<lambda> at 0x000001C92D566430>
+max_episode_steps:
+    value: 200
+max_grad_norm:
+    value: 0.5
+n_envs:
+    value: 9
+n_epochs:
+    value: 10
+n_steps:
+    value: 2048
+name:
+    value: 2025_07_18_16_37_480PPO
+normalize_advantage:
+    value: "True"
+num_envs:
+    value: 1
+num_timesteps:
+    value: 0
+observation_space:
+    value: Box(-10.0, 10.0, (143,), float32)
+policy:
+    value: |-
+        ActorCriticPolicy(
+          (features_extractor): FlattenExtractor(
+            (flatten): Flatten(start_dim=1, end_dim=-1)
+          )
+          (pi_features_extractor): FlattenExtractor(
+            (flatten): Flatten(start_dim=1, end_dim=-1)
+          )
+          (vf_features_extractor): FlattenExtractor(
+            (flatten): Flatten(start_dim=1, end_dim=-1)
+          )
+          (mlp_extractor): MlpExtractor(
+            (policy_net): Sequential(
+              (0): Linear(in_features=143, out_features=256, bias=True)
+              (1): ReLU()
+              (2): Linear(in_features=256, out_features=256, bias=True)
+              (3): ReLU()
+            )
+            (value_net): Sequential(
+              (0): Linear(in_features=143, out_features=256, bias=True)
+              (1): ReLU()
+              (2): Linear(in_features=256, out_features=256, bias=True)
+              (3): ReLU()
+            )
+          )
+          (action_net): Linear(in_features=256, out_features=63, bias=True)
+          (value_net): Linear(in_features=256, out_features=1, bias=True)
+        )
+policy_class:
+    value: <class 'stable_baselines3.common.policies.ActorCriticPolicy'>
+policy_kwargs:
+    value: '{''activation_fn'': <class ''torch.nn.modules.activation.ReLU''>, ''net_arch'': {''pi'': [256, 256], ''vf'': [256, 256]}}'
+policy_type:
+    value: PPO
+rollout_buffer:
+    value: <stable_baselines3.common.buffers.RolloutBuffer object at 0x000001C92E64CFD0>
+rollout_buffer_class:
+    value: <class 'stable_baselines3.common.buffers.RolloutBuffer'>
+rollout_buffer_kwargs:
+    value: '{}'
+sde_sample_freq:
+    value: -1
+seed:
+    value: 0
+start_time:
+    value: 1752871080089823500
+target_kl:
+    value: None
+tensorboard_log:
+    value: None
+total_timesteps:
+    value: 500000
+use_sde:
+    value: "False"
+verbose:
+    value: 1
+vf_coef:
+    value: 0.5

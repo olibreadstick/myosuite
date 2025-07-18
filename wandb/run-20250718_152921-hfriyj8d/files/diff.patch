@@ -1,0 +1,116 @@
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index 10797ef..5ee4944 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -172,7 +172,7 @@ if __name__ == "__main__":
+     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
+ 
+     #TODO TOTAL TIMESTEPS HERE
+-    model.learn(total_timesteps=1000, tb_log_name=env_name + "_" + time_now, callback=callback)
++    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+     model.save(curr_dir+'/WheelDist_policy')
+ 
+     # Record video after training
+diff --git a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip
+index e12cca7..396b8da 100644
+Binary files a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip and b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip differ
+diff --git a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4
+index 364e26e..c4a07d5 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 and b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 b/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4
+index 13c3592..979d2ff 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 and b/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+index a3c6174..04b07ca 100644
+--- a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
++++ b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+@@ -15,9 +15,9 @@ class WheelHoldFixedEnvV0(BaseV0):
+ 
+     DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'hand_qpos', 'hand_qvel']
+     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+-        "goal_dist": 150.0,
+-        "hand_dist" : 50.0,
+-        "fin_open": -15.0,
++        "goal_dist": 100.0,
++        "hand_dist" : 100.0,
++        "fin_open": -100.0,
+         "bonus": 0.0,
+         "penalty": 20,
+     }
+@@ -145,7 +145,7 @@ class WheelHoldFixedEnvV0(BaseV0):
+             ('hand_dist', math.exp(-2.0*abs(hand_initpos_err_right))),
+             ('bonus', 1.*(dist_right<2*0) + 1.*(dist_right<0)),
+             ('act_reg', -1.*act_mag),
+-            ("fin_open", np.exp(-5 * fin_open)),  # fin_open + np.log(fin_open +1e-8)
++            ("fin_open", np.exp(-10 * fin_open)),  # fin_open + np.log(fin_open +1e-8)
+ 
+             #('grip_bonus', 1.0 * grip_right),
+             ('penalty', -1.*drop),
+Submodule myosuite/simhive/myo_sim 3b866e0..587629a:
+diff --git a/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml b/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
+index d0205cb..e41adb8 100644
+--- a/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
++++ b/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
+@@ -41,6 +41,7 @@
+             <site name="wheelchair_grip_left" pos="-0.0371 0.27 0.05" size="0.005" rgba="0 1 0 0.5"/>
+         </body>
+         <site name="hand_start_right" pos="0.5324 -0.3142 -0.1024" size="0.008" rgba="1 0 0 1"/>
++        <site name="rail_bottom_right" pos="0.5324 -0.33 -0.1024" size="0.005" rgba="0 0 1 1"/>
+         <body name = "right_rear_wheel" pos="0.4953 -0.5842 -0.1524">
+             <joint name= "right_rear" axis="-1 0 0" damping=".03"/>
+             <geom mesh= "rear_wheel2" pos="-0.4953 0.5842 0.1524" material="dark_grey" conaffinity="0" contype="0"/>
+@@ -64,6 +65,7 @@
+             <geom mesh="handrail_coll16" pos="0.0371 0 0" rgba="0 0 1 0"/>
+             
+             <site name="wheelchair_grip_right" pos="0.0371 0.27 0.05" size="0.005" rgba="0 1 0 1"/>
++
+             <!-- <geom type = "sphere" pos="0.0371 0.27 0.05" size = "0.008" rgba="1 0 0 1"/> -->
+         </body>
+         
+diff --git a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_assets_for_wc.xml b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_assets_for_wc.xml
+index e078871..d8a8702 100644
+--- a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_assets_for_wc.xml
++++ b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_assets_for_wc.xml
+@@ -80,7 +80,6 @@
+         <mesh file="../myo_sim/meshes/scaphoid.stl" name="proximal_row_geom_2_sdfastSCAPHOIDw"/>
+         <mesh file="../myo_sim/meshes/pisiform.stl" name="proximal_row_geom_3_sdfastPISIFORMw"/>
+         <mesh file="../myo_sim/meshes/triquetrum.stl" name="proximal_row_geom_4_sdfastTRIQUETRALw"/>
+-
+         <mesh name="thorax" file="../myo_sim/meshes/thorax.stl" scale="1 1 1"/>
+         <mesh name="clavicle" file="../myo_sim/meshes/clavicle.stl" scale="1 1 1"/>
+         <mesh name="scapula" file="../myo_sim/meshes/scapula.stl" scale="1 1 1"/>
+diff --git a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myotorso_abdomen_chain+arm.xml b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myotorso_abdomen_chain+arm.xml
+index 86b728f..26b1a75 100644
+--- a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myotorso_abdomen_chain+arm.xml
++++ b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myotorso_abdomen_chain+arm.xml
+@@ -37,7 +37,7 @@
+             <geom mesh="torso_geom_1_hat_spine" name="torso_geom_1" type="mesh"/>
+             <geom mesh="torso_geom_2_hat_jaw" name="torso_geom_2" type="mesh"/>
+             <geom mesh="torso_geom_3_hat_skull" name="torso_geom_3" type="mesh"/>
+-            <geom mesh="torso_geom_4_hat_ribs" name="torso_geom_4" type="mesh"/>
++            <geom mesh="torso_geom_4_hat_ribs_no_scapcla" name="torso_geom_4_hat_ribs_no_scapcla" type="mesh"/>
+ 
+             <site name="ercspn_r_ercspn_r-P2" pos="-0.055 0.11 0.0241"/>
+             <site name="ercspn_l_ercspn_l-P2" pos="-0.055 0.11 -0.0241"/>
+@@ -53,7 +53,7 @@
+             <site name="spine_1" pos="0.030 0 0" class="myotorso_marker"/>
+             <site name="thoracis_spine" pos="-.018 .194 0" class="myotorso_marker"/>
+             <site name="chest" pos="0.084 0.221 0" class="myotorso_marker"/>
+-            <body name="arm_pos" pos="0.038 0.374 0.024" euler = "-1.57 0 1.57" >
++            <body name="arm_pos" pos="-0.01 0.376 0.025" euler = "-1.57 -0.1 1.57" >
+                 <include file="../../../../simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml"/>
+             </body>
+         </body>
+diff --git a/myosuite/simhive/myo_sim/wheelchairandhuman/assets/myotorso_abdomen_assets.xml b/myosuite/simhive/myo_sim/wheelchairandhuman/assets/myotorso_abdomen_assets.xml
+index 477e618..2326915 100644
+--- a/myosuite/simhive/myo_sim/wheelchairandhuman/assets/myotorso_abdomen_assets.xml
++++ b/myosuite/simhive/myo_sim/wheelchairandhuman/assets/myotorso_abdomen_assets.xml
+@@ -39,7 +39,7 @@
+         <mesh file="../myo_sim/meshes/hat_spine.stl" name="torso_geom_1_hat_spine"/>
+         <mesh file="../myo_sim/meshes/hat_jaw.stl" name="torso_geom_2_hat_jaw"/>
+         <mesh file="../myo_sim/meshes/hat_skull.stl" name="torso_geom_3_hat_skull"/>
+-        <mesh file="../myo_sim/meshes/hat_ribs_scap.stl" name="torso_geom_4_hat_ribs"/>
++        <mesh file="../myo_sim/meshes/hat_ribs_scap_no_scapcla.stl" name="torso_geom_4_hat_ribs_no_scapcla"/>
+ 
+         <material name="MatSkin_myotorso" specular="0.2" shininess=".1" reflectance="0.5" rgba="0.9 .7 1 1"/>
+     </asset>

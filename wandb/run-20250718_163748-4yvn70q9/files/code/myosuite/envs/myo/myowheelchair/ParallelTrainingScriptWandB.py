@@ -162,17 +162,17 @@ if __name__ == "__main__":
 
     print("Begin training")
 
-    model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001, policy_kwargs=policy_kwargs)
+    # model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001, policy_kwargs=policy_kwargs)
 
     # TODO TRY LOADING
-    # model_num =   '2025_07_16_13_12_43' # Loaded WheelDist_policy_GOOD
-    # model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs)
+    model_num =   '2025_07_16_13_12_43' # Loaded WheelDist_policy_GOOD
+    model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs)
 
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
 
     #TODO TOTAL TIMESTEPS HERE
-    model.learn(total_timesteps=1e6, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
     model.save(curr_dir+'/WheelDist_policy')
 
     # Record video after training

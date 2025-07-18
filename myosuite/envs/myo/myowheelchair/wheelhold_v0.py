@@ -15,9 +15,9 @@ class WheelHoldFixedEnvV0(BaseV0):
 
     DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'hand_qpos', 'hand_qvel']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
-        "goal_dist": 150.0,
+        "goal_dist": 100.0,
         "hand_dist" : 50.0,
-        "fin_open": -15.0,
+        "fin_open": -100.0,
         "bonus": 0.0,
         "penalty": 20,
     }
@@ -47,12 +47,12 @@ class WheelHoldFixedEnvV0(BaseV0):
             **kwargs,
         ):
         self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
-        # self.palm_r = self.sim.model.site_name2id("palm_r")
+        self.palm_r = self.sim.model.site_name2id("palm_r")
         self.hand_start_right = self.sim.model.site_name2id("hand_start_right")
         self.rail_bottom_right = self.sim.model.site_name2id("rail_bottom_right")
 
         # define the palm and tip site id.
-        self.palm_r = self.sim.model.site_name2id('S_grasp')
+        # self.palm_r = self.sim.model.site_name2id('S_grasp')
         self.init_palm_z = self.sim.data.site_xpos[self.palm_r][-1]
         self.fin0 = self.sim.model.site_name2id("THtip")
         self.fin1 = self.sim.model.site_name2id("IFtip")
@@ -125,7 +125,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         hand_initpos_err_right = np.linalg.norm(obs_dict['hand_initpos_err_right'])
         
         act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
-        drop = dist_right > 0.300
+        drop = dist_right > 0.500
 
         fin_keys = ['fin0', 'fin1', 'fin2', 'fin3', 'fin4']
         # for fin in fin_keys:
@@ -142,18 +142,18 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         rwd_dict = collections.OrderedDict((
             ('goal_dist', math.exp(-2.0*abs(dist_right))), #exp(- k * abs(x))
-            ('hand_dist', math.exp(-2.0*abs(hand_initpos_err_right))),
+            ('hand_dist', math.exp(-1.0*abs(hand_initpos_err_right))),
             ('bonus', 1.*(dist_right<2*0) + 1.*(dist_right<0)),
             ('act_reg', -1.*act_mag),
-            ("fin_open", np.exp(-5 * fin_open)),  # fin_open + np.log(fin_open +1e-8)
+            ("fin_open", np.exp(-20 * fin_open)),  # fin_open + np.log(fin_open +1e-8)
 
             #('grip_bonus', 1.0 * grip_right),
             ('penalty', -1.*drop),
             ('sparse', dist_right < 0.055),
             #('sparse', 1.0 * grip_right - dist_right),
-            ('solved', dist_right < 0.015),
+            ('solved', dist_right < 0.001),
             #('solved', grip_right and dist_right < 0.015),
-            ('done', dist_right > 0.515),
+            ('done', dist_right > 0.9),
         ))
         
         rwd_dict['dense'] = np.sum([wt*rwd_dict[key] for key, wt in self.rwd_keys_wt.items()], axis=0)
