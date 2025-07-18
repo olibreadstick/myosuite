@@ -7,7 +7,8 @@ import time
 from datetime import datetime
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import SubprocVecEnv
-from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback
+from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback, StopTrainingOnRewardThreshold
+from stable_baselines3.common.monitor import Monitor
 from wandb.integration.sb3 import WandbCallback
 import skvideo.io
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union
@@ -31,6 +32,7 @@ def make_env(env_name, idx, seed=0):
     def _init():
         env = gym.make(env_name)
         env.seed(seed + idx)
+        env = Monitor(env)
         return env
     return _init
 
@@ -87,7 +89,7 @@ if __name__ == "__main__":
     import multiprocessing
     multiprocessing.set_start_method("spawn", force=True)
 
-    num_cpu = 8
+    num_cpu = 9
 
     dof_env = ['myoHandWheelHoldFixed-v0']
 
@@ -166,12 +168,11 @@ if __name__ == "__main__":
     model_num =   '2025_07_16_13_12_43' # Loaded WheelDist_policy_GOOD
     model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs)
 
-    callback = CallbackList([eval_callback])
-
-    #TODO TOTAL TIMESTEPS HERE
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
-    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+
+    #TODO TOTAL TIMESTEPS HERE
+    model.learn(total_timesteps=1000, tb_log_name=env_name + "_" + time_now, callback=callback)
     model.save(curr_dir+'/WheelDist_policy')
 
     # Record video after training

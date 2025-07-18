@@ -49,6 +49,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
         # self.palm_r = self.sim.model.site_name2id("palm_r")
         self.hand_start_right = self.sim.model.site_name2id("hand_start_right")
+        self.rail_bottom_right = self.sim.model.site_name2id("rail_bottom_right")
 
         # define the palm and tip site id.
         self.palm_r = self.sim.model.site_name2id('S_grasp')
@@ -85,6 +86,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.obs_dict['fin3'] = self.sim.data.site_xpos[self.fin3]
         self.obs_dict['fin4'] = self.sim.data.site_xpos[self.fin4]
 
+        self.obs_dict["rail_bottom_right"] = self.sim.data.site_xpos[self.rail_bottom_right]
+
         if self.sim.model.na>0:
             self.obs_dict['act'] = self.sim.data.act[:].copy()
 
@@ -109,6 +112,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         obs_dict['fin3'] = sim.data.site_xpos[self.fin3]
         obs_dict['fin4'] = sim.data.site_xpos[self.fin4]
 
+        obs_dict["rail_bottom_right"] = sim.data.site_xpos[self.rail_bottom_right]
+
         #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
         if sim.model.na>0:
             obs_dict['act'] = sim.data.act[:].copy()
@@ -126,7 +131,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         # for fin in fin_keys:
         #     print(fin, type(obs_dict[fin]), np.shape(obs_dict[fin]))
         fin_open = sum(
-            np.linalg.norm(obs_dict[fin].squeeze() - obs_dict['palm_pos'].squeeze(), axis=-1)
+            np.linalg.norm(obs_dict[fin].squeeze() - obs_dict['rail_bottom_right'].squeeze(), axis=-1)
             for fin in fin_keys
         )
         
