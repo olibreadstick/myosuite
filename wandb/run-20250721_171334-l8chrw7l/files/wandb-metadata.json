@@ -1,0 +1,28 @@
+{
+  "os": "Windows-10-10.0.26100-SP0",
+  "python": "CPython 3.8.20",
+  "startedAt": "2025-07-21T21:13:34.969164Z",
+  "program": "c:/Users/jasmi/Documents/GitHub/myosuite/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py",
+  "codePath": "myosuite\\envs\\myo\\myowheelchair\\ParallelTrainingScriptWandB.py",
+  "codePathLocal": "myosuite\\envs\\myo\\myowheelchair\\ParallelTrainingScriptWandB.py",
+  "git": {
+    "remote": "https://github.com/olibreadstick/myosuite.git",
+    "commit": "5dfee51c906a68156e9299df583f4b0c3c0e14f4"
+  },
+  "email": "jasmine.jh.wang04@gmail.com",
+  "root": "C:\\Users\\jasmi\\Documents\\GitHub\\myosuite",
+  "host": "Jas-P14S",
+  "executable": "C:\\Users\\jasmi\\miniconda3\\envs\\MyoSuite\\python.exe",
+  "cpu_count": 8,
+  "cpu_count_logical": 16,
+  "disk": {
+    "/": {
+      "total": "1021821579264",
+      "used": "276819423232"
+    }
+  },
+  "memory": {
+    "total": "29706903552"
+  },
+  "writerId": "2q8q51hs9oat78r5hityddxdsojyh0ch"
+}

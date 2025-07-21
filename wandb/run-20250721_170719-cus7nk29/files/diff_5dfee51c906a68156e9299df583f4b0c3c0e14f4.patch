@@ -1,0 +1,585 @@
+warning: in the working copy of 'myosuite/envs/myo/myowheelchair/TESTING.ipynb', LF will be replaced by CRLF the next time Git touches it
+diff --git a/myosuite/envs/myo/myowheelchair/Gripping_policy_goodish.zip b/myosuite/envs/myo/myowheelchair/Gripping_policy_goodish.zip
+deleted file mode 100644
+index a3066cc..0000000
+Binary files a/myosuite/envs/myo/myowheelchair/Gripping_policy_goodish.zip and /dev/null differ
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index 2c59fcd..bb773d3 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -163,17 +163,17 @@ if __name__ == "__main__":
+ 
+     print("Begin training")
+ 
+-    model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001, policy_kwargs=policy_kwargs)
++    # model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001, policy_kwargs=policy_kwargs)
+ 
+     # TODO TRY LOADING
+-    # model_num =   '2025_07_16_13_12_43' # Loaded WheelDist_policy_GOOD
+-    # model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs)
++    model_num =   '2025_07_18_16_53_10'
++    model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs)
+ 
+     obs_callback = TensorboardCallback()
+     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
+ 
+     #TODO TOTAL TIMESTEPS HERE
+-    model.learn(total_timesteps=1e6, tb_log_name=env_name + "_" + time_now, callback=callback)
++    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+     model.save(curr_dir+'/WheelDist_policy')
+ 
+     # Record video after training
+diff --git a/myosuite/envs/myo/myowheelchair/TESTING.ipynb b/myosuite/envs/myo/myowheelchair/TESTING.ipynb
+index dbd4918..b37c98b 100644
+--- a/myosuite/envs/myo/myowheelchair/TESTING.ipynb
++++ b/myosuite/envs/myo/myowheelchair/TESTING.ipynb
+@@ -9,7 +9,7 @@
+   },
+   {
+    "cell_type": "code",
+-   "execution_count": 1,
++   "execution_count": 9,
+    "metadata": {},
+    "outputs": [],
+    "source": [
+@@ -41,28 +41,18 @@
+   },
+   {
+    "cell_type": "code",
+-   "execution_count": 2,
++   "execution_count": 10,
+    "metadata": {},
+    "outputs": [
+-    {
+-     "name": "stdout",
+-     "output_type": "stream",
+-     "text": [
+-      "\u001b[36m    MyoSuite: A contact-rich simulation suite for musculoskeletal motor control\n",
+-      "        Vittorio Caggiano, Huawei Wang, Guillaume Durandau, Massimo Sartori, Vikash Kumar\n",
+-      "        L4DC-2019 | https://sites.google.com/view/myosuite\n",
+-      "    \u001b[0m\n"
+-     ]
+-    },
+     {
+      "data": {
+       "text/plain": [
+-       "(array([ 0.    , -0.0111, -0.0134,  0.0102, -0.75  ,  0.1511, -0.    ,\n",
+-       "         0.    , -0.152 ,  0.6447,  0.    , -0.552 , -0.3131,  0.    ,\n",
+-       "        -0.3817,  0.2514, -0.37  ,  2.094 ,  1.1118,  0.1257,  0.1828,\n",
+-       "        -0.1414,  0.6968, -0.5062,  0.3569,  0.    ,  0.7462,  0.0262,\n",
+-       "         1.139 ,  1.3432,  0.7462, -0.0052,  1.0604,  1.2961,  0.8169,\n",
+-       "         0.0131,  0.6598,  1.571 ,  0.5498, -0.0654,  0.5184,  1.2411,\n",
++       "(array([ 0.    ,  0.0339,  0.0229, -0.011 , -0.465 ,  0.1272, -0.0095,\n",
++       "         0.    , -0.152 ,  0.5833,  0.    , -0.552 , -0.3131,  0.    ,\n",
++       "        -0.2639,  0.4085, -0.37  ,  2.094 ,  1.0778,  0.11  ,  0.4363,\n",
++       "        -0.7854,  0.78  , -0.6246,  0.1937,  0.0087,  1.1704,  0.2356,\n",
++       "         0.8955,  1.3432,  1.461 ,  0.0105,  0.7384,  1.1625,  1.3354,\n",
++       "        -0.1545,  0.1414,  1.571 ,  1.2411, -0.2618,  0.4477,  0.597 ,\n",
+        "         0.    ,  0.    ,  0.    ,  0.    ,  0.    ,  0.    ,  0.    ,\n",
+        "         0.    ,  0.    ,  0.    ,  0.    ,  0.    ,  0.    ,  0.    ,\n",
+        "         0.    ,  0.    ,  0.    ,  0.    ,  0.    ,  0.    ,  0.    ,\n",
+@@ -81,7 +71,7 @@
+        " {})"
+       ]
+      },
+-     "execution_count": 2,
++     "execution_count": 10,
+      "metadata": {},
+      "output_type": "execute_result"
+     }
+@@ -200,7 +190,7 @@
+   },
+   {
+    "cell_type": "code",
+-   "execution_count": null,
++   "execution_count": 7,
+    "metadata": {},
+    "outputs": [],
+    "source": [
+@@ -209,7 +199,7 @@
+   },
+   {
+    "cell_type": "code",
+-   "execution_count": null,
++   "execution_count": 4,
+    "metadata": {},
+    "outputs": [],
+    "source": [
+@@ -217,6 +207,27 @@
+     "data = mujoco.MjData(model)"
+    ]
+   },
++  {
++   "cell_type": "code",
++   "execution_count": 5,
++   "metadata": {},
++   "outputs": [
++    {
++     "ename": "AttributeError",
++     "evalue": "'mujoco._structs.MjModel' object has no attribute 'joint_name2id'",
++     "output_type": "error",
++     "traceback": [
++      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
++      "\u001b[1;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
++      "Cell \u001b[1;32mIn[5], line 1\u001b[0m\n\u001b[1;32m----> 1\u001b[0m data\u001b[38;5;241m.\u001b[39mqpos[\u001b[43mmodel\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mjoint_name2id\u001b[49m(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mright_rear\u001b[39m\u001b[38;5;124m\"\u001b[39m)]\n",
++      "\u001b[1;31mAttributeError\u001b[0m: 'mujoco._structs.MjModel' object has no attribute 'joint_name2id'"
++     ]
++    }
++   ],
++   "source": [
++    "data.qpos[model.joint_name2id(\"right_rear\")]"
++   ]
++  },
+   {
+    "cell_type": "code",
+    "execution_count": null,
+@@ -272,9 +283,29 @@
+   },
+   {
+    "cell_type": "code",
+-   "execution_count": null,
++   "execution_count": 8,
+    "metadata": {},
+-   "outputs": [],
++   "outputs": [
++    {
++     "name": "stdout",
++     "output_type": "stream",
++     "text": [
++      "['wheelchair', 'left_rear', 'right_rear', 'left_fork', 'left_caster', 'right_fork', 'right_caster', 'sternoclavicular_r2', 'sternoclavicular_r3', 'unrotscap_r3', 'unrotscap_r2', 'acromioclavicular_r2', 'acromioclavicular_r3', 'acromioclavicular_r1', 'unrothum_r1', 'unrothum_r3', 'unrothum_r2', 'elv_angle', 'shoulder_elv', 'shoulder1_r2', 'shoulder_rot', 'elbow_flexion', 'pro_sup', 'deviation', 'flexion', 'cmc_abduction', 'cmc_flexion', 'mp_flexion', 'ip_flexion', 'mcp2_flexion', 'mcp2_abduction', 'pm2_flexion', 'md2_flexion', 'mcp3_flexion', 'mcp3_abduction', 'pm3_flexion', 'md3_flexion', 'mcp4_flexion', 'mcp4_abduction', 'pm4_flexion', 'md4_flexion', 'mcp5_flexion', 'mcp5_abduction', 'pm5_flexion', 'md5_flexion']\n",
++      "45\n",
++      "[0.     0.     0.0031 0.9999 0.0127 0.     0.     0.     0.     0.\n",
++      " 0.     0.     0.     0.     0.     0.     0.     0.     0.     0.\n",
++      " 0.     0.     0.     0.     0.     0.     0.     0.     0.     0.\n",
++      " 0.     0.     0.     0.     0.     0.     0.     0.     0.     0.\n",
++      " 0.     0.     0.     0.     0.     0.     0.     0.     0.     0.\n",
++      " 0.    ]\n",
++      "51\n",
++      "[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.\n",
++      " 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.\n",
++      " 0. 0.]\n",
++      "50\n"
++     ]
++    }
++   ],
+    "source": [
+     "# JOINTS\n",
+     "print([model.jnt(i).name for i in range(model.njnt)])\n",
+diff --git a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip
+index 75fdfb6..60b7deb 100644
+Binary files a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip and b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip differ
+diff --git a/myosuite/envs/myo/myowheelchair/WheelDist_policy_GOOD.zip b/myosuite/envs/myo/myowheelchair/WheelDist_policy_GOOD.zip
+deleted file mode 100644
+index d6ec8d8..0000000
+Binary files a/myosuite/envs/myo/myowheelchair/WheelDist_policy_GOOD.zip and /dev/null differ
+diff --git a/myosuite/envs/myo/myowheelchair/render.py b/myosuite/envs/myo/myowheelchair/render.py
+index 797577d..fa0ab01 100644
+--- a/myosuite/envs/myo/myowheelchair/render.py
++++ b/myosuite/envs/myo/myowheelchair/render.py
+@@ -11,7 +11,7 @@ if __name__ == "__main__":
+     env.reset()
+ 
+     model = PPO("MlpPolicy", env, verbose=0)
+-    pi = PPO.load(curr_dir+"/WheelDist_policy")
++    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_21_16_40_38\best_model.zip")
+ 
+     env = gym.make('myoHandWheelHoldFixed-v0')
+     env.reset()
+diff --git a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender copy.mp4 b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender copy.mp4
+deleted file mode 100644
+index b395191..0000000
+Binary files a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender copy.mp4 and /dev/null differ
+diff --git a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4
+index a328ae4..5a604a4 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 and b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/videos/HandGripping.mp4 b/myosuite/envs/myo/myowheelchair/videos/HandGripping.mp4
+deleted file mode 100644
+index a328ae4..0000000
+Binary files a/myosuite/envs/myo/myowheelchair/videos/HandGripping.mp4 and /dev/null differ
+diff --git a/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 b/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4
+index 60bf46d..c73c97b 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 and b/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/wheelhold_v0_onlygrip.py b/myosuite/envs/myo/myowheelchair/wheelhold_v0_onlygrip.py
+deleted file mode 100644
+index ab13797..0000000
+--- a/myosuite/envs/myo/myowheelchair/wheelhold_v0_onlygrip.py
++++ /dev/null
+@@ -1,182 +0,0 @@
+-""" =================================================
+-# Copyright (c) Facebook, Inc. and its affiliates
+-Authors  :: Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano (caggiano@gmail.com)
+-================================================= """
+-
+-import collections
+-import numpy as np
+-import math
+-from myosuite.utils import gym
+-
+-from myosuite.envs.myo.base_v0 import BaseV0
+-
+-
+-class WheelHoldFixedEnvV0(BaseV0):
+-
+-    DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'hand_qpos', 'hand_qvel']
+-    DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+-        "goal_dist": 100.0,
+-        "hand_dist" : 50.0,
+-        "fin_open": -100.0,
+-        "bonus": 0.0,
+-        "penalty": 20,
+-    }
+-
+-    def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
+-
+-        # EzPickle.__init__(**locals()) is capturing the input dictionary of the init method of this class.
+-        # In order to successfully capture all arguments we need to call gym.utils.EzPickle.__init__(**locals())
+-        # at the leaf level, when we do inheritance like we do here.
+-        # kwargs is needed at the top level to account for injection of __class__ keyword.
+-        # Also see: https://github.com/openai/gym/pull/1497
+-        gym.utils.EzPickle.__init__(self, model_path, obsd_model_path, seed, **kwargs)
+-
+-        # This two step construction is required for pickling to work correctly. All arguments to all __init__
+-        # calls must be pickle friendly. Things like sim / sim_obsd are NOT pickle friendly. Therefore we
+-        # first construct the inheritance chain, which is just __init__ calls all the way down, with env_base
+-        # creating the sim / sim_obsd instances. Next we run through "setup"  which relies on sim / sim_obsd
+-        # created in __init__ to complete the setup.
+-        super().__init__(model_path=model_path, obsd_model_path=obsd_model_path, seed=seed, env_credits=self.MYO_CREDIT)
+-
+-        self._setup(**kwargs)
+-
+-
+-    def _setup(self,
+-            obs_keys:list = DEFAULT_OBS_KEYS,
+-            weighted_reward_keys:list = DEFAULT_RWD_KEYS_AND_WEIGHTS,
+-            **kwargs,
+-        ):
+-        self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
+-        self.palm_r = self.sim.model.site_name2id("palm_r")
+-        self.hand_start_right = self.sim.model.site_name2id("hand_start_right")
+-        self.rail_bottom_right = self.sim.model.site_name2id("rail_bottom_right")
+-
+-        # define the palm and tip site id.
+-        # self.palm_r = self.sim.model.site_name2id('S_grasp')
+-        self.init_palm_z = self.sim.data.site_xpos[self.palm_r][-1]
+-        self.fin0 = self.sim.model.site_name2id("THtip")
+-        self.fin1 = self.sim.model.site_name2id("IFtip")
+-        self.fin2 = self.sim.model.site_name2id("MFtip")
+-        self.fin3 = self.sim.model.site_name2id("RFtip")
+-        self.fin4 = self.sim.model.site_name2id("LFtip")
+-
+-        #self.goal_sid_left = self.sim.model.site_name2id("wheel_grip_goal_left")
+-        #self.object_init_pos = self.sim.data.site_xpos[self.object_sid].copy()
+-
+-        super()._setup(obs_keys=obs_keys,
+-                    weighted_reward_keys=weighted_reward_keys,
+-                    **kwargs,
+-        )
+-        
+-        self.init_qpos = self.sim.model.key_qpos[0].copy() # copy the sitting + grabbing wheels keyframe
+-
+-
+-    def get_obs_vec(self):
+-        self.obs_dict['time'] = np.array([self.sim.data.time])
+-        self.obs_dict['hand_qpos'] = self.sim.data.qpos[13:].copy()
+-        self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:].copy()*self.dt
+-        #self.obs_dict['wheel_pos'] = self.sim.data.site_xpos[self.object_sid]
+-        self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
+-        self.obs_dict['hand_initpos_err_right'] = self.sim.data.site_xpos[self.hand_start_right]- self.sim.data.site_xpos[self.goal_sid_right]
+-
+-        self.obs_dict["palm_pos"] = self.sim.data.site_xpos[self.palm_r]
+-        self.obs_dict['fin0'] = self.sim.data.site_xpos[self.fin0]
+-        self.obs_dict['fin1'] = self.sim.data.site_xpos[self.fin1]
+-        self.obs_dict['fin2'] = self.sim.data.site_xpos[self.fin2]
+-        self.obs_dict['fin3'] = self.sim.data.site_xpos[self.fin3]
+-        self.obs_dict['fin4'] = self.sim.data.site_xpos[self.fin4]
+-
+-        self.obs_dict["rail_bottom_right"] = self.sim.data.site_xpos[self.rail_bottom_right]
+-
+-        if self.sim.model.na>0:
+-            self.obs_dict['act'] = self.sim.data.act[:].copy()
+-
+-        t, obs = self.obsdict2obsvec(self.obs_dict, self.obs_keys)
+-        return obs
+-
+-    def get_obs_dict(self, sim):
+-        obs_dict = {}
+-        obs_dict['time'] = np.array([sim.data.time])
+-        obs_dict['hand_qpos'] = sim.data.qpos[13:].copy()
+-        obs_dict['hand_qvel'] = sim.data.qvel[12:].copy()*self.dt
+-        #obs_dict['wheel_pos'] = sim.data.site_xpos[self.object_sid]
+-        #obs_dict['wheelchair_grip_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+-        obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid_right] - sim.data.site_xpos[self.palm_r]
+-        obs_dict['hand_initpos_err_right'] = sim.data.site_xpos[self.hand_start_right]- sim.data.site_xpos[self.goal_sid_right]
+-        #add the initial and end target points
+-        #could add the fingertips here,
+-        obs_dict["palm_pos"] = sim.data.site_xpos[self.palm_r]
+-        obs_dict['fin0'] = sim.data.site_xpos[self.fin0]
+-        obs_dict['fin1'] = sim.data.site_xpos[self.fin1]
+-        obs_dict['fin2'] = sim.data.site_xpos[self.fin2]
+-        obs_dict['fin3'] = sim.data.site_xpos[self.fin3]
+-        obs_dict['fin4'] = sim.data.site_xpos[self.fin4]
+-
+-        obs_dict["rail_bottom_right"] = sim.data.site_xpos[self.rail_bottom_right]
+-
+-        #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+-        if sim.model.na>0:
+-            obs_dict['act'] = sim.data.act[:].copy()
+-        
+-        return obs_dict
+-
+-    def get_reward_dict(self, obs_dict):
+-        dist_right = np.linalg.norm(obs_dict['wheel_err_right'])
+-        hand_initpos_err_right = np.linalg.norm(obs_dict['hand_initpos_err_right'])
+-        
+-        act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
+-        drop = dist_right > 0.500
+-
+-        fin_keys = ['fin0', 'fin1', 'fin2', 'fin3', 'fin4']
+-        # for fin in fin_keys:
+-        #     print(fin, type(obs_dict[fin]), np.shape(obs_dict[fin]))
+-        fin_open = sum(
+-            np.linalg.norm(obs_dict[fin].squeeze() - obs_dict['rail_bottom_right'].squeeze(), axis=-1)
+-            for fin in fin_keys
+-        )
+-        
+-        # grip_right = self._check_hand_grip_contact(
+-        #     hand_geom_names=["right_index_tip", "right_thumb_tip"],
+-        #     wheel_geom_names=[f"handrail_coll{i}" for i in range(1, 17)]
+-        # )
+-
+-        rwd_dict = collections.OrderedDict((
+-            ('goal_dist', math.exp(-2.0*abs(dist_right))), #exp(- k * abs(x))
+-            ('hand_dist', math.exp(-1.0*abs(hand_initpos_err_right))),
+-            ('bonus', 1.*(dist_right<2*0) + 1.*(dist_right<0)),
+-            ('act_reg', -1.*act_mag),
+-            ("fin_open", np.exp(-20 * fin_open)),  # fin_open + np.log(fin_open +1e-8)
+-
+-            #('grip_bonus', 1.0 * grip_right),
+-            ('penalty', -1.*drop),
+-            ('sparse', dist_right < 0.055),
+-            #('sparse', 1.0 * grip_right - dist_right),
+-            ('solved', dist_right < 0.001),
+-            #('solved', grip_right and dist_right < 0.015),
+-            ('done', dist_right > 0.9),
+-        ))
+-        
+-        rwd_dict['dense'] = np.sum([wt*rwd_dict[key] for key, wt in self.rwd_keys_wt.items()], axis=0)
+-        
+-        return rwd_dict
+-    
+-    def reset(self, **kwargs):
+-        self.robot.sync_sims(self.sim, self.sim_obsd)
+-        obs = super().reset(**kwargs)
+-        return obs
+-
+-    # def _check_hand_grip_contact(self, hand_geom_names, wheel_geom_names):
+-    #     hand_geom_ids = [self.sim.model.geom_name2id(n) for n in hand_geom_names]
+-    #     wheel_geom_ids = [self.sim.model.geom_name2id(n) for n in wheel_geom_names]
+-        
+-    #     for i in range(self.sim.data.ncon):
+-    #         contact = self.sim.data.contact[i]
+-    #         if (contact.geom1 in hand_geom_ids and contact.geom2 in wheel_geom_ids) or \
+-    #         (contact.geom2 in hand_geom_ids and contact.geom1 in wheel_geom_ids):
+-    #             return True
+-    #     return False
+-
+-
+-
+-# class WheelHoldRandomEnvV0(WheelHoldFixedEnvV0):
+-
+diff --git a/myosuite/envs/myo/myowheelchair/wheelhold_v0_rot_notworking.py b/myosuite/envs/myo/myowheelchair/wheelhold_v0_rot_notworking.py
+deleted file mode 100644
+index d534ea5..0000000
+--- a/myosuite/envs/myo/myowheelchair/wheelhold_v0_rot_notworking.py
++++ /dev/null
+@@ -1,190 +0,0 @@
+-""" =================================================
+-# Copyright (c) Facebook, Inc. and its affiliates
+-Authors  :: Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano (caggiano@gmail.com)
+-================================================= """
+-
+-import collections
+-import numpy as np
+-import math
+-from myosuite.utils import gym
+-
+-from myosuite.envs.myo.base_v0 import BaseV0
+-
+-
+-class WheelHoldFixedEnvV0(BaseV0):
+-
+-    DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'wheel_angle', 'hand_qpos', 'hand_qvel']
+-    DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+-        "goal_dist": 150.0,
+-        "hand_dist" : 50.0,
+-        "fin_open": -15.0,
+-        "bonus": 0.0,
+-        "penalty": 20,
+-        "wheel_rotation": 100.0,
+-        "rotation_bonus": 20.0
+-    }
+-
+-    def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
+-
+-        # EzPickle.__init__(**locals()) is capturing the input dictionary of the init method of this class.
+-        # In order to successfully capture all arguments we need to call gym.utils.EzPickle.__init__(**locals())
+-        # at the leaf level, when we do inheritance like we do here.
+-        # kwargs is needed at the top level to account for injection of __class__ keyword.
+-        # Also see: https://github.com/openai/gym/pull/1497
+-        gym.utils.EzPickle.__init__(self, model_path, obsd_model_path, seed, **kwargs)
+-
+-        # This two step construction is required for pickling to work correctly. All arguments to all __init__
+-        # calls must be pickle friendly. Things like sim / sim_obsd are NOT pickle friendly. Therefore we
+-        # first construct the inheritance chain, which is just __init__ calls all the way down, with env_base
+-        # creating the sim / sim_obsd instances. Next we run through "setup"  which relies on sim / sim_obsd
+-        # created in __init__ to complete the setup.
+-        super().__init__(model_path=model_path, obsd_model_path=obsd_model_path, seed=seed, env_credits=self.MYO_CREDIT)
+-
+-        self._setup(**kwargs)
+-
+-
+-    def _setup(self,
+-            obs_keys:list = DEFAULT_OBS_KEYS,
+-            weighted_reward_keys:list = DEFAULT_RWD_KEYS_AND_WEIGHTS,
+-            **kwargs,
+-        ):
+-        self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
+-        # self.palm_r = self.sim.model.site_name2id("palm_r")
+-        self.hand_start_right = self.sim.model.site_name2id("hand_start_right")
+-        self.rail_bottom_right = self.sim.model.site_name2id("rail_bottom_right")
+-
+-        # define the palm and tip site id.
+-        self.palm_r = self.sim.model.site_name2id('S_grasp')
+-        self.init_palm_z = self.sim.data.site_xpos[self.palm_r][-1]
+-        self.fin0 = self.sim.model.site_name2id("THtip")
+-        self.fin1 = self.sim.model.site_name2id("IFtip")
+-        self.fin2 = self.sim.model.site_name2id("MFtip")
+-        self.fin3 = self.sim.model.site_name2id("RFtip")
+-        self.fin4 = self.sim.model.site_name2id("LFtip")
+-
+-        self.wheel_joint_id = self.sim.model.joint_name2id("right_rear")
+-        self.init_wheel_angle = self.sim.data.qpos[self.wheel_joint_id]
+-
+-
+-        #self.goal_sid_left = self.sim.model.site_name2id("wheel_grip_goal_left")
+-        #self.object_init_pos = self.sim.data.site_xpos[self.object_sid].copy()
+-
+-        super()._setup(obs_keys=obs_keys,
+-                    weighted_reward_keys=weighted_reward_keys,
+-                    **kwargs,
+-        )
+-        
+-        self.init_qpos = self.sim.model.key_qpos[0].copy() # copy the sitting + grabbing wheels keyframe
+-
+-
+-    def get_obs_vec(self):
+-        self.obs_dict['time'] = np.array([self.sim.data.time])
+-        self.obs_dict['hand_qpos'] = self.sim.data.qpos[13:].copy()
+-        self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:].copy()*self.dt
+-        #self.obs_dict['wheel_pos'] = self.sim.data.site_xpos[self.object_sid]
+-        self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
+-        self.obs_dict['hand_initpos_err_right'] = self.sim.data.site_xpos[self.hand_start_right]- self.sim.data.site_xpos[self.goal_sid_right]
+-
+-        self.obs_dict["palm_pos"] = self.sim.data.site_xpos[self.palm_r]
+-        self.obs_dict['fin0'] = self.sim.data.site_xpos[self.fin0]
+-        self.obs_dict['fin1'] = self.sim.data.site_xpos[self.fin1]
+-        self.obs_dict['fin2'] = self.sim.data.site_xpos[self.fin2]
+-        self.obs_dict['fin3'] = self.sim.data.site_xpos[self.fin3]
+-        self.obs_dict['fin4'] = self.sim.data.site_xpos[self.fin4]
+-
+-        self.obs_dict["rail_bottom_right"] = self.sim.data.site_xpos[self.rail_bottom_right]
+-
+-        self.obs_dict['wheel_angle'] = np.array([self.sim.data.qpos[self.wheel_joint_id]])
+-
+-
+-        if self.sim.model.na>0:
+-            self.obs_dict['act'] = self.sim.data.act[:].copy()
+-
+-        t, obs = self.obsdict2obsvec(self.obs_dict, self.obs_keys)
+-        return obs
+-
+-    def get_obs_dict(self, sim):
+-        obs_dict = {}
+-        obs_dict['time'] = np.array([sim.data.time])
+-        obs_dict['hand_qpos'] = sim.data.qpos[13:].copy()
+-        obs_dict['hand_qvel'] = sim.data.qvel[12:].copy()*self.dt
+-        #obs_dict['wheel_pos'] = sim.data.site_xpos[self.object_sid]
+-        #obs_dict['wheelchair_grip_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+-        obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid_right] - sim.data.site_xpos[self.palm_r]
+-        obs_dict['hand_initpos_err_right'] = sim.data.site_xpos[self.hand_start_right]- sim.data.site_xpos[self.goal_sid_right]
+-        #add the initial and end target points
+-        #could add the fingertips here,
+-        obs_dict["palm_pos"] = sim.data.site_xpos[self.palm_r]
+-        obs_dict['fin0'] = sim.data.site_xpos[self.fin0]
+-        obs_dict['fin1'] = sim.data.site_xpos[self.fin1]
+-        obs_dict['fin2'] = sim.data.site_xpos[self.fin2]
+-        obs_dict['fin3'] = sim.data.site_xpos[self.fin3]
+-        obs_dict['fin4'] = sim.data.site_xpos[self.fin4]
+-
+-        obs_dict["rail_bottom_right"] = sim.data.site_xpos[self.rail_bottom_right]
+-
+-        obs_dict['wheel_angle'] = np.array([sim.data.qpos[self.wheel_joint_id]])
+-
+-
+-        #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+-        if sim.model.na>0:
+-            obs_dict['act'] = sim.data.act[:].copy()
+-        
+-        return obs_dict
+-
+-    def get_reward_dict(self, obs_dict):
+-        dist_right = np.linalg.norm(obs_dict['wheel_err_right'])
+-        hand_initpos_err_right = np.linalg.norm(obs_dict['hand_initpos_err_right'])
+-
+-        #for wheel rotation
+-        wheel_angle_now = self.sim.data.qpos[self.wheel_joint_id]
+-        wheel_rotation = wheel_angle_now - self.init_wheel_angle
+-        wheel_target = np.pi / 2  # 90 degrees
+-
+-        wheel_rotation_err = abs(wheel_rotation - wheel_target)
+-        wheel_rotation_rwd = math.exp(-5.0 * wheel_rotation_err)
+-
+-        
+-        
+-        act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
+-        drop = dist_right > 0.300
+-
+-        fin_keys = ['fin0', 'fin1', 'fin2', 'fin3', 'fin4']
+-        # for fin in fin_keys:
+-        #     print(fin, type(obs_dict[fin]), np.shape(obs_dict[fin]))
+-        fin_open = sum(
+-            np.linalg.norm(obs_dict[fin].squeeze() - obs_dict['rail_bottom_right'].squeeze(), axis=-1)
+-            for fin in fin_keys
+-        )
+-        
+-        # grip_right = self._check_hand_grip_contact(
+-        #     hand_geom_names=["right_index_tip", "right_thumb_tip"],
+-        #     wheel_geom_names=[f"handrail_coll{i}" for i in range(1, 17)]
+-        # )
+-
+-        rwd_dict = collections.OrderedDict((
+-            ('goal_dist', math.exp(-2.0*abs(dist_right))), #exp(- k * abs(x))
+-            ('hand_dist', math.exp(-2.0*abs(hand_initpos_err_right))),
+-            ('bonus', 1.*(dist_right<2*0) + 1.*(dist_right<0)),
+-            ('act_reg', -1.*act_mag),
+-            ("fin_open", np.exp(-5 * fin_open)),  # fin_open + np.log(fin_open +1e-8)
+-
+-            #('grip_bonus', 1.0 * grip_right),
+-            ('penalty', -1.*drop),
+-            ('sparse', dist_right < 0.055),
+-            #('sparse', 1.0 * grip_right - dist_right),
+-            ('solved', dist_right < 0.015 and wheel_rotation_err < 0.05),
+-            #('solved', grip_right and dist_right < 0.015),
+-            ('done', dist_right > 0.515),
+-            ('wheel_rotation', wheel_rotation_rwd),
+-            ('rotation_bonus', 1.0 if wheel_rotation_err < 0.05 else 0.0),
+-        ))
+-        
+-        rwd_dict['dense'] = np.sum([wt*rwd_dict[key] for key, wt in self.rwd_keys_wt.items()], axis=0)
+-        
+-        return rwd_dict
+-    
+-    def reset(self, **kwargs):
+-        self.robot.sync_sims(self.sim, self.sim_obsd)
+-        obs = super().reset(**kwargs)
+-        return obs
