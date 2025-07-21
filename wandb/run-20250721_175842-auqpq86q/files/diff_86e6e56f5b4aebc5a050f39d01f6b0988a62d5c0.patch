@@ -1,0 +1,73 @@
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index d045513..1991137 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -163,11 +163,11 @@ if __name__ == "__main__":
+ 
+     print("Begin training")
+ 
+-    model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001, policy_kwargs=policy_kwargs)
++    # model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001, policy_kwargs=policy_kwargs)
+ 
+     # TODO TRY LOADING
+-    # model_num =   '2025_07_18_16_53_10'
+-    # model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs)
++    model_num =   '2025_07_21_17_13_37'
++    model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs)
+ 
+     obs_callback = TensorboardCallback()
+     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
+diff --git a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip
+index 31ccbaa..5a48a41 100644
+Binary files a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip and b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip differ
+diff --git a/myosuite/envs/myo/myowheelchair/render.py b/myosuite/envs/myo/myowheelchair/render.py
+index 5b596b5..b89c2e7 100644
+--- a/myosuite/envs/myo/myowheelchair/render.py
++++ b/myosuite/envs/myo/myowheelchair/render.py
+@@ -11,7 +11,7 @@ if __name__ == "__main__":
+     env.reset()
+ 
+     model = PPO("MlpPolicy", env, verbose=0)
+-    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_21_17_13_37\best_model.zip")
++    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_21_17_41_09\best_model.zip")
+ 
+     env = gym.make('myoHandWheelHoldFixed-v0')
+     env.reset()
+diff --git a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4
+index 726a229..2913937 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 and b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 b/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4
+index ea1754b..ebbff3c 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 and b/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+index 99d7c71..0c3ac06 100644
+--- a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
++++ b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+@@ -17,13 +17,13 @@ class WheelHoldFixedEnvV0(BaseV0):
+ 
+     DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'wheel_angle', 'hand_qpos', 'hand_qvel']
+     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+-        "goal_dist": 10.0,
+-        "hand_dist" : 5.0,
++        "goal_dist": 0.0,
++        "hand_dist" : 0.0,
+         "fin_open": -10.0,
+         "bonus": 0.0,
+-        "penalty": 2.0,
+-        "wheel_rotation": 0.0,
+-        "rotation_bonus": 0.0
++        "penalty": 0,
++        "wheel_rotation": 10.0,
++        "rotation_bonus": 2.0
+     }
+ 
+     def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
+@@ -141,7 +141,7 @@ class WheelHoldFixedEnvV0(BaseV0):
+         #for wheel rotation
+         wheel_angle_now = self.sim.data.qpos[self.wheel_joint_id]
+         wheel_rotation = wheel_angle_now - self.init_wheel_angle
+-        wheel_target = np.pi / 4  # 90 degrees
++        wheel_target = np.pi / 2  # 90 degrees
+ 
+         wheel_rotation_err = abs(wheel_rotation - wheel_target)
+         wheel_rotation_rwd = math.exp(-5.0 * wheel_rotation_err)

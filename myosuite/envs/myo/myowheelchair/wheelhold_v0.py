@@ -5,6 +5,8 @@ Authors  :: Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano (caggiano@gma
 
 ## PUSHING WHEELCHAIR ##
 
+# TODO traing from 174109, make fin open 0, make wheel rotation 15???
+
 import collections
 import numpy as np
 import math
@@ -17,13 +19,13 @@ class WheelHoldFixedEnvV0(BaseV0):
 
     DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'wheel_angle', 'hand_qpos', 'hand_qvel']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
-        "goal_dist": 10.0,
-        "hand_dist" : 5.0,
+        "goal_dist": 0.0,
+        "hand_dist" : 0.0,
         "fin_open": -10.0,
         "bonus": 0.0,
-        "penalty": 2.0,
-        "wheel_rotation": 0.0,
-        "rotation_bonus": 0.0
+        "penalty": 0,
+        "wheel_rotation": 10.0,
+        "rotation_bonus": 2.0
     }
 
     def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
@@ -141,7 +143,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         #for wheel rotation
         wheel_angle_now = self.sim.data.qpos[self.wheel_joint_id]
         wheel_rotation = wheel_angle_now - self.init_wheel_angle
-        wheel_target = np.pi / 4  # 90 degrees
+        wheel_target = np.pi / 2  # 90 degrees
 
         wheel_rotation_err = abs(wheel_rotation - wheel_target)
         wheel_rotation_rwd = math.exp(-5.0 * wheel_rotation_err)
