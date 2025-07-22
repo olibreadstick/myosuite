@@ -20,12 +20,12 @@ class WheelHoldFixedEnvV0(BaseV0):
     DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'wheel_angle', 'hand_qpos', 'hand_qvel']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
         "goal_dist": 10.0,
-        "hand_dist" : 5.0,
-        "fin_open": -10.0,
+        "hand_dist" : 0.0,
+        "fin_open": -15.0,
         "bonus": 0.0,
         "penalty": 2.0,
-        "wheel_rotation": 0.0,
-        "rotation_bonus": 0.0
+        "wheel_rotation": 15.0,
+        "rotation_bonus": 2.0
     }
 
     def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):

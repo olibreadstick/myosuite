@@ -178,7 +178,7 @@ if __name__ == "__main__":
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
 
     #TODO TOTAL TIMESTEPS HERE
-    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.learn(total_timesteps=2e6, tb_log_name=env_name + "_" + time_now, callback=callback)
     model.save(curr_dir+'/WheelDist_policy')
 
     # Record video after training

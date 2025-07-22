@@ -11,7 +11,7 @@ if __name__ == "__main__":
     env.reset()
 
     model = PPO("MlpPolicy", env, verbose=0)
-    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_22_18_14_02\best_model.zip")
+    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\myosuite\envs\myo\myowheelchair\WithRot_good_grip.zip")
 
     env = gym.make('myoHandWheelHoldFixed-v0')
     env.reset()
