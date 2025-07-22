@@ -1,0 +1,30 @@
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index 1991137..f71b57a 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -166,7 +166,7 @@ if __name__ == "__main__":
+     # model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001, policy_kwargs=policy_kwargs)
+ 
+     # TODO TRY LOADING
+-    model_num =   '2025_07_21_17_13_37'
++    model_num =   '22025_07_21_17_41_09'
+     model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs)
+ 
+     obs_callback = TensorboardCallback()
+diff --git a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+index 8aaebcb..3d97175 100644
+--- a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
++++ b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+@@ -21,10 +21,10 @@ class WheelHoldFixedEnvV0(BaseV0):
+     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+         "goal_dist": 0.0,
+         "hand_dist" : 0.0,
+-        "fin_open": -10.0,
++        "fin_open": 0.0,
+         "bonus": 0.0,
+         "penalty": 0,
+-        "wheel_rotation": 10.0,
++        "wheel_rotation": 15.0,
+         "rotation_bonus": 2.0
+     }
+ 

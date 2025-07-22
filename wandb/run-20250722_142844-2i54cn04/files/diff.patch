@@ -1,0 +1,69 @@
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index 1991137..3de3b44 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -166,7 +166,7 @@ if __name__ == "__main__":
+     # model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001, policy_kwargs=policy_kwargs)
+ 
+     # TODO TRY LOADING
+-    model_num =   '2025_07_21_17_13_37'
++    model_num =   '2025_07_22_13_58_57'
+     model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs)
+ 
+     obs_callback = TensorboardCallback()
+diff --git a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip
+index 6f959af..ff96a4a 100644
+Binary files a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip and b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip differ
+diff --git a/myosuite/envs/myo/myowheelchair/render.py b/myosuite/envs/myo/myowheelchair/render.py
+index ee5efc3..4a3e8dd 100644
+--- a/myosuite/envs/myo/myowheelchair/render.py
++++ b/myosuite/envs/myo/myowheelchair/render.py
+@@ -11,15 +11,15 @@ if __name__ == "__main__":
+     env.reset()
+ 
+     model = PPO("MlpPolicy", env, verbose=0)
+-    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_21_17_58_43\best_model.zip")
++    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_22_13_58_57\best_model.zip")
+ 
+     env = gym.make('myoHandWheelHoldFixed-v0')
+     env.reset()
+ 
+     # render
+     frames = []
+-    for _ in range(300):
+-        frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=0)) 
++    for _ in range(500):
++        frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=5)) 
+         o = env.get_obs()
+         a = pi.predict(o)[0]
+         next_o, r, done, *_, ifo = env.step(
+diff --git a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4
+index ec9bf35..ba924fe 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 and b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 b/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4
+index f0a1d0b..e811a82 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 and b/myosuite/envs/myo/myowheelchair/videos/Wheel_MinDist.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+index 8aaebcb..24ecdd6 100644
+--- a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
++++ b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+@@ -19,13 +19,13 @@ class WheelHoldFixedEnvV0(BaseV0):
+ 
+     DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'wheel_angle', 'hand_qpos', 'hand_qvel']
+     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+-        "goal_dist": 0.0,
+-        "hand_dist" : 0.0,
+-        "fin_open": -10.0,
++        "goal_dist": 15.0,
++        "hand_dist" : 5.0,
++        "fin_open": 15.0,
+         "bonus": 0.0,
+-        "penalty": 0,
+-        "wheel_rotation": 10.0,
+-        "rotation_bonus": 2.0
++        "penalty": 2,
++        "wheel_rotation": 0.0,
++        "rotation_bonus": 0.0
+     }
+ 
+     def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
