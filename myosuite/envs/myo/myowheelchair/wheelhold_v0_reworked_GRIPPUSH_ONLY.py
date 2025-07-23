@@ -3,6 +3,8 @@
 Authors  :: Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano (caggiano@gmail.com)
 ================================================= """
 
+# unchanged since 2025_07_23_17_12_20
+
 import collections
 import numpy as np
 import math
@@ -13,13 +15,10 @@ from myosuite.envs.myo.base_v0 import BaseV0
 
 class WheelHoldFixedEnvV0(BaseV0):
 
-    DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'wheel_angle', 'hand_qpos', 'hand_qvel', 'task_phase']
+    DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'wheel_angle', 'hand_qpos', 'hand_qvel']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
-        "return_reward": 15.0,
-        "hand_err_reward": 15.0,
-
         "dist_reward": 5.0,
-        "palm_touch_rwd": 5.0,
+        "palm_touch_rwd": 1.0,
         "wheel_rotation": 20.0,
         "fin_open": -2.0,
 
@@ -51,13 +50,10 @@ class WheelHoldFixedEnvV0(BaseV0):
             weighted_reward_keys:list = DEFAULT_RWD_KEYS_AND_WEIGHTS,
             **kwargs,
         ):
-        # self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right") #green, movable
+        self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right") #green, movable
         self.palm_r = self.sim.model.site_name2id("palm_r")
         self.hand_start_right = self.sim.model.site_name2id("hand_start_right") #red, static
-        # self.rail_bottom_right = self.sim.model.site_name2id("rail_bottom_right") #blue, movable
-        
-        # hand target position, start returning when reached
-        self.hand_TARGET_right = self.sim.model.site_name2id("hand_TARGET_right") #blue, STATIC
+        self.rail_bottom_right = self.sim.model.site_name2id("rail_bottom_right") #blue, movable
 
         # define the palm and tip site id.
         # self.palm_r = self.sim.model.site_name2id('S_grasp')
@@ -70,12 +66,6 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         self.wheel_joint_id = self.sim.model.joint_name2id("right_rear") #right wheel joint
         self.init_wheel_angle = self.sim.data.qpos[self.wheel_joint_id].copy() #INIITAL wheel angle
-
-        #elbow jnt
-        self.elbow_joint_id = self.sim.model.joint_name2id("elbow_flexion")
-
-        #phases check
-        self.task_phase = "push"
 
         super()._setup(obs_keys=obs_keys,
                     weighted_reward_keys=weighted_reward_keys,
@@ -90,8 +80,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.obs_dict['hand_qpos'] = self.sim.data.qpos[13:].copy()
         self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:].copy()*self.dt
 
-        # self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
-        # self.obs_dict['hand_initpos_err_right'] = self.sim.data.site_xpos[self.hand_start_right]- self.sim.data.site_xpos[self.goal_sid_right]
+        self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
+        self.obs_dict['hand_initpos_err_right'] = self.sim.data.site_xpos[self.hand_start_right]- self.sim.data.site_xpos[self.goal_sid_right]
 
         self.obs_dict["palm_pos"] = self.sim.data.site_xpos[self.palm_r]
         self.obs_dict['fin0'] = self.sim.data.site_xpos[self.fin0]
@@ -100,16 +90,10 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.obs_dict['fin3'] = self.sim.data.site_xpos[self.fin3]
         self.obs_dict['fin4'] = self.sim.data.site_xpos[self.fin4]
 
-        # self.obs_dict["rail_bottom_right"] = self.sim.data.site_xpos[self.rail_bottom_right]
+        self.obs_dict["rail_bottom_right"] = self.sim.data.site_xpos[self.rail_bottom_right]
 
         self.obs_dict['wheel_angle'] = np.array([self.sim.data.qpos[self.wheel_joint_id]])
-        self.obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
 
-        #calculate palm from target distance
-        self.obs_dict['hand_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_TARGET_right]
-
-        #calculate palm to return position
-        self.obs_dict['return_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_start_right]
 
         if self.sim.model.na>0:
             self.obs_dict['act'] = self.sim.data.act[:].copy()
@@ -123,8 +107,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         obs_dict['hand_qpos'] = sim.data.qpos[13:].copy()
         obs_dict['hand_qvel'] = sim.data.qvel[12:].copy()*self.dt
 
-        # obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid_right] - sim.data.site_xpos[self.palm_r]
-        # obs_dict['hand_initpos_err_right'] = sim.data.site_xpos[self.hand_start_right]- sim.data.site_xpos[self.goal_sid_right]
+        obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid_right] - sim.data.site_xpos[self.palm_r]
+        obs_dict['hand_initpos_err_right'] = sim.data.site_xpos[self.hand_start_right]- sim.data.site_xpos[self.goal_sid_right]
         
         obs_dict["palm_pos"] = sim.data.site_xpos[self.palm_r]
         obs_dict['fin0'] = sim.data.site_xpos[self.fin0]
@@ -133,16 +117,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         obs_dict['fin3'] = sim.data.site_xpos[self.fin3]
         obs_dict['fin4'] = sim.data.site_xpos[self.fin4]
 
-        # obs_dict["rail_bottom_right"] = sim.data.site_xpos[self.rail_bottom_right]
+        obs_dict["rail_bottom_right"] = sim.data.site_xpos[self.rail_bottom_right]
         obs_dict['wheel_angle'] = np.array([sim.data.qpos[self.wheel_joint_id]])
-
-        obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
-
-        #calculate palm from target distance
-        obs_dict['hand_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_TARGET_right]
-
-        #calculate palm to return position
-        self.obs_dict['return_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_start_right]
 
         if sim.model.na>0:
             obs_dict['act'] = sim.data.act[:].copy()
@@ -166,7 +142,7 @@ class WheelHoldFixedEnvV0(BaseV0):
                 palm_touching_rail = True
                 break
         ### SPARSE reward for palm touching rail ###
-        palm_touch_rwd = 5.0 if palm_touching_rail else 0.0
+        palm_touch_rwd = 2.0 if palm_touching_rail else 0.0
 
         ### DENSE reward for palm close to rail ###
         rail_center_pos = self.sim.data.body_xpos[rail_body_id]
@@ -189,73 +165,21 @@ class WheelHoldFixedEnvV0(BaseV0):
             for fin in fin_keys
         )
 
-        # ELBOW JOINT VALUE
-        elbow_now = self.sim.data.qpos[self.elbow_joint_id]
+        rwd_dict = collections.OrderedDict((
+            # ('goal_dist', math.exp(-2.0*abs(dist_right))), #exp(- k * abs(x))
+            ('dist_reward', dist_reward),
+            ('palm_touch_rwd', palm_touch_rwd),
+            ('wheel_rotation', 15.0*wheel_rotation), #as big as possible
+            ('act_reg', -0.5*act_mag),
+            ("fin_open", np.exp(-5.0*fin_open)), 
 
-        #errs
-        hand_err = np.linalg.norm(obs_dict["hand_err"])
-        return_err = np.linalg.norm(obs_dict["return_err"])
-
-        # IF ELSE STARTS HERE
-        if self.task_phase == "push" and hand_err < 0.005 and elbow_now < 0.7:
-            print("returning")
-            self.task_phase = "return"
-            rwd_dict = collections.OrderedDict((
-                ('return_rwd', math.exp(-20.0*abs(return_err))),
-                ('hand_err_rwd', 0),    
-
-                ('dist_reward', 0),
-                ('palm_touch_rwd', 0),
-                ('wheel_rotation', 0), 
-                ('act_reg', -0.5*act_mag),
-                ("fin_open", 0), 
-
-                # MUST KEYS
-                ('bonus', 0), 
-                ('penalty', 0), 
-                ('sparse', return_err < 0.055),
-                ('solved', 0), 
-                ('done', 0), 
-            ))
-        elif self.task_phase == "return" and return_err < 0.005 and elbow_now > 1.05:
-            print("return succesful, pushing again")
-            self.task_phase = "push"
-            rwd_dict = collections.OrderedDict((
-                ('return_rwd', 0),
-                ('hand_err_rwd', math.exp(-20.0*abs(hand_err))),    
-
-                ('dist_reward', dist_reward),
-                ('palm_touch_rwd', palm_touch_rwd),
-                ('wheel_rotation', 15.0*wheel_rotation), #as big as possible
-                ('act_reg', -0.5*act_mag),
-                ("fin_open", np.exp(-5.0*fin_open)), 
-
-                # MUST KEYS
-                ('bonus', 1.*(wheel_angle_now < self.init_wheel_angle)), #if it rotates cw
-                ('penalty', -1.*(wheel_angle_now > self.init_wheel_angle)), #if it rotates ccw
-                ('sparse', 0),
-                ('solved', wheel_rotation < -500.0), #if it rotates cw a lot
-                ('done', wheel_rotation > 500.0), #if it rotates ccw a lot
-            ))
-        else:
-            rwd_dict = collections.OrderedDict((
-                ('return_rwd', 0),
-                ('hand_err_rwd', math.exp(-20.0*abs(hand_err))),   
-
-                ('dist_reward', dist_reward),
-                ('palm_touch_rwd', palm_touch_rwd),
-                ('wheel_rotation', 15.0*wheel_rotation), #as big as possible
-                ('act_reg', -0.5*act_mag),
-                ("fin_open", np.exp(-5.0*fin_open)), 
-
-                # MUST KEYS
-                ('bonus', 1.*(wheel_angle_now < self.init_wheel_angle)), #if it rotates cw
-                ('penalty', -1.*(wheel_angle_now > self.init_wheel_angle)), #if it rotates ccw
-                ('sparse', 0),
-                ('solved', wheel_rotation < -500.0), #if it rotates cw a lot
-                ('done', wheel_rotation > 500.0), #if it rotates ccw a lot
-            ))
-            
+            # MUST KEYS
+            ('bonus', 1.*(wheel_angle_now < self.init_wheel_angle)), #if it rotates cw
+            ('penalty', -1.*(wheel_angle_now > self.init_wheel_angle)), #if it rotates ccw
+            ('sparse', 0),
+            ('solved', wheel_rotation < -500.0), #if it rotates cw a lot
+            ('done', wheel_rotation > 500.0), #if it rotates ccw a lot
+        ))
         
         rwd_dict['dense'] = np.sum([wt*rwd_dict[key] for key, wt in self.rwd_keys_wt.items()], axis=0)
         
