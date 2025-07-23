@@ -143,7 +143,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         #for wheel rotation
         wheel_angle_now = self.sim.data.qpos[self.wheel_joint_id]
         wheel_rotation = wheel_angle_now - self.init_wheel_angle
-        wheel_target = np.pi / 2  # 90 degrees
+        wheel_target = np.pi / 3  # 90 degrees
 
         wheel_rotation_err = abs(wheel_rotation - wheel_target)
         wheel_rotation_rwd = math.exp(-5.0 * wheel_rotation_err)

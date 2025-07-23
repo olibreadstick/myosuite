@@ -1,0 +1,789 @@
+warning: in the working copy of 'logs/myoHandWheelHoldFixed-v0_0.monitor.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'logs/myoHandWheelHoldFixed-v0_1.monitor.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'logs/myoHandWheelHoldFixed-v0_2.monitor.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'logs/myoHandWheelHoldFixed-v0_3.monitor.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'logs/myoHandWheelHoldFixed-v0_4.monitor.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'logs/myoHandWheelHoldFixed-v0_5.monitor.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'logs/myoHandWheelHoldFixed-v0_6.monitor.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'logs/myoHandWheelHoldFixed-v0_7.monitor.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'logs/myoHandWheelHoldFixed-v0_8.monitor.csv', LF will be replaced by CRLF the next time Git touches it
+diff --git a/logs/myoHandWheelHoldFixed-v0_0.monitor.csv b/logs/myoHandWheelHoldFixed-v0_0.monitor.csv
+index fec2164..0bb2f34 100644
+--- a/logs/myoHandWheelHoldFixed-v0_0.monitor.csv
++++ b/logs/myoHandWheelHoldFixed-v0_0.monitor.csv
+@@ -1,30 +1,29 @@
+-#{"t_start": 1753224774.0299125, "env_id": "myoHandWheelHoldFixed-v0"}
++#{"t_start": 1753290010.7210588, "env_id": "myoHandWheelHoldFixed-v0"}
+ r,l,t
+-1018.209174,75,1.350015
+-1020.940301,75,1.9791
+-1008.803841,75,2.583881
+-1015.215094,75,3.201633
+-1020.49203,75,3.805361
+-1011.465186,75,4.430061
+-1022.100663,75,5.122949
+-1016.977596,75,5.830501
+-1015.786147,75,6.463489
+-1005.24642,75,7.104644
+-1014.64146,75,7.829228
+-1022.513248,75,8.469374
+-1013.148015,75,9.096324
+-1015.361962,75,9.807156
+-1009.632244,75,10.670025
+-1015.356999,75,11.542421
+-1019.020847,75,12.498425
+-1024.77945,75,13.336984
+-1013.179611,75,14.167206
+-998.769393,75,15.000518
+-1007.487081,75,15.81484
+-1023.920204,75,16.678379
+-1024.121073,75,17.352536
+-1015.44631,75,18.047298
+-1013.074355,75,18.658811
+-1013.747815,75,19.293501
+-1016.604967,75,19.920493
+-1032.681333,75,36.874123
++663.298602,75,1.63248
++659.203579,75,2.296863
++658.847541,75,2.951632
++657.907657,75,3.586314
++663.416681,75,4.228289
++661.794812,75,4.874343
++659.506742,75,5.529168
++660.202202,75,6.185737
++651.991887,75,6.832486
++665.468969,75,7.495609
++659.924322,75,8.1736
++650.137559,75,8.873548
++656.936933,75,9.517241
++660.636652,75,10.177578
++665.909897,75,10.818597
++646.358187,75,11.478255
++654.839632,75,12.127883
++664.095911,75,12.795257
++660.320768,75,13.423198
++662.764689,75,14.097039
++664.430204,75,14.752751
++651.719335,75,15.406759
++664.396429,75,16.11166
++660.876986,75,16.776053
++667.259838,75,17.42832
++663.783812,75,18.091506
++654.237051,75,18.74014
+diff --git a/logs/myoHandWheelHoldFixed-v0_1.monitor.csv b/logs/myoHandWheelHoldFixed-v0_1.monitor.csv
+index 4421cd1..19566ee 100644
+--- a/logs/myoHandWheelHoldFixed-v0_1.monitor.csv
++++ b/logs/myoHandWheelHoldFixed-v0_1.monitor.csv
+@@ -1,30 +1,29 @@
+-#{"t_start": 1753224773.9540372, "env_id": "myoHandWheelHoldFixed-v0"}
++#{"t_start": 1753290010.794798, "env_id": "myoHandWheelHoldFixed-v0"}
+ r,l,t
+-1018.038952,75,1.42589
+-1015.221499,75,2.054976
+-1018.464875,75,2.661757
+-1006.705365,75,3.278508
+-1021.653701,75,3.881237
+-1017.788697,75,4.507934
+-1007.05453,75,5.199835
+-1021.037248,75,5.906376
+-1004.871929,75,6.540365
+-1014.494042,75,7.182525
+-1017.911855,75,7.903104
+-1023.789134,75,8.543236
+-1023.71766,75,9.172199
+-1018.340709,75,9.885042
+-1012.007245,75,10.746904
+-1013.871669,75,11.620304
+-1025.856771,75,12.575301
+-1014.108624,75,13.412859
+-1015.855303,75,14.242078
+-1015.124265,75,15.075393
+-1005.811843,75,15.892716
+-1020.78182,75,16.755257
+-1017.389266,75,17.428412
+-999.80709,75,18.125176
+-1024.739544,75,18.733685
+-1011.331395,75,19.370376
+-1020.099623,75,19.995369
+-1032.681333,75,36.951008
++654.673016,75,1.558741
++666.894942,75,2.225142
++663.564494,75,2.877893
++665.78032,75,3.512575
++659.835911,75,4.156573
++651.006336,75,4.802623
++661.08367,75,5.453417
++660.85101,75,6.111998
++660.288606,75,6.76076
++653.344583,75,7.42187
++666.060201,75,8.099861
++659.768502,75,8.799809
++667.459871,75,9.443502
++658.761615,75,10.101823
++656.287617,75,10.744858
++658.692076,75,11.404516
++660.534656,75,12.054144
++658.64586,75,12.721518
++662.320446,75,13.347648
++656.699949,75,14.0233
++657.104015,75,14.677944
++659.826252,75,15.33302
++662.454958,75,16.039444
++662.672827,75,16.702314
++658.309535,75,17.353566
++664.950267,75,18.017767
++655.328472,75,18.668601
+diff --git a/logs/myoHandWheelHoldFixed-v0_2.monitor.csv b/logs/myoHandWheelHoldFixed-v0_2.monitor.csv
+index 2af4f30..ddbeac8 100644
+--- a/logs/myoHandWheelHoldFixed-v0_2.monitor.csv
++++ b/logs/myoHandWheelHoldFixed-v0_2.monitor.csv
+@@ -1,30 +1,29 @@
+-#{"t_start": 1753224774.0364635, "env_id": "myoHandWheelHoldFixed-v0"}
++#{"t_start": 1753290010.7501795, "env_id": "myoHandWheelHoldFixed-v0"}
+ r,l,t
+-1025.72838,75,1.341465
+-1019.468319,75,1.973549
+-1029.754,75,2.57833
+-1018.906947,75,3.19708
+-1021.977203,75,3.79881
+-1004.523002,75,4.42351
+-1020.598773,75,5.118414
+-1012.181029,75,5.82095
+-1008.101821,75,6.456938
+-1014.794415,75,7.101101
+-1007.700471,75,7.820677
+-1018.359757,75,8.462823
+-1012.937935,75,9.089773
+-1010.102852,75,9.800605
+-1019.98727,75,10.663474
+-1021.245019,75,11.540877
+-1020.815508,75,12.491874
+-1021.558869,75,13.330433
+-1013.244045,75,14.159651
+-1013.636865,75,14.992966
+-1015.014765,75,15.809289
+-1019.313493,75,16.67283
+-1015.354633,75,17.345985
+-1015.455349,75,18.040747
+-1026.864529,75,18.65226
+-1011.083511,75,19.28695
+-1008.833618,75,19.911942
+-1032.681333,75,36.867572
++659.117462,75,1.603359
++658.748698,75,2.269761
++662.173336,75,2.920508
++649.179852,75,3.557194
++654.073389,75,4.199169
++664.932997,75,4.845222
++656.320483,75,5.500048
++668.656535,75,6.156616
++667.522319,75,6.801348
++656.281947,75,7.466488
++654.229597,75,8.144479
++642.3622,75,8.846051
++659.771102,75,9.488121
++653.828367,75,10.146441
++662.358085,75,10.789476
++663.574894,75,11.449134
++663.38337,75,12.100778
++660.646305,75,12.768158
++656.390637,75,13.392267
++655.15735,75,14.065883
++650.951166,75,14.722033
++653.326078,75,15.375034
++669.548921,75,16.082539
++645.80558,75,16.746932
++659.006275,75,17.398184
++656.653954,75,18.062386
++655.001832,75,18.713219
+diff --git a/logs/myoHandWheelHoldFixed-v0_3.monitor.csv b/logs/myoHandWheelHoldFixed-v0_3.monitor.csv
+index d5e058b..a722ab6 100644
+--- a/logs/myoHandWheelHoldFixed-v0_3.monitor.csv
++++ b/logs/myoHandWheelHoldFixed-v0_3.monitor.csv
+@@ -1,30 +1,29 @@
+-#{"t_start": 1753224774.0151355, "env_id": "myoHandWheelHoldFixed-v0"}
++#{"t_start": 1753290010.746151, "env_id": "myoHandWheelHoldFixed-v0"}
+ r,l,t
+-1016.470861,75,1.364792
+-1013.88181,75,1.993877
+-1009.570288,75,2.600659
+-1019.092492,75,3.21741
+-1014.640687,75,3.820138
+-1009.599595,75,4.446836
+-1027.010956,75,5.140737
+-1022.783935,75,5.844277
+-1006.599214,75,6.479266
+-1016.256974,75,7.126419
+-1005.70785,75,7.845002
+-1021.213129,75,8.484151
+-1023.300564,75,9.112103
+-1020.069043,75,9.821933
+-1020.302725,75,10.686806
+-1021.044568,75,11.562205
+-1007.392285,75,12.514203
+-1009.999227,75,13.351761
+-1016.918892,75,14.183985
+-1013.034747,75,15.015295
+-1023.854995,75,15.831617
+-1026.001277,75,16.694158
+-1016.213895,75,17.368312
+-1013.735831,75,18.062075
+-1018.151553,75,18.674591
+-1023.678184,75,19.308278
+-1013.509442,75,19.93327
+-1032.681333,75,36.88991
++656.152419,75,1.606029
++658.259,75,2.275817
++665.260477,75,2.92654
++662.952619,75,3.559201
++657.479709,75,4.20522
++661.854197,75,4.849251
++654.464202,75,5.502064
++662.389902,75,6.15863
++663.613336,75,6.805377
++661.082547,75,7.468502
++656.750965,75,8.146496
++656.241049,75,8.848456
++659.959699,75,9.490139
++664.36135,75,10.15047
++653.255375,75,10.793505
++663.44312,75,11.453163
++658.544244,75,12.102791
++653.37534,75,12.768152
++668.488638,75,13.396295
++659.821102,75,14.069912
++667.183028,75,14.725014
++654.69151,75,15.379063
++669.67812,75,16.084543
++666.057614,75,16.750961
++665.336478,75,17.402213
++658.646917,75,18.064231
++653.161202,75,18.715048
+diff --git a/logs/myoHandWheelHoldFixed-v0_4.monitor.csv b/logs/myoHandWheelHoldFixed-v0_4.monitor.csv
+index 4624d63..0c8614b 100644
+--- a/logs/myoHandWheelHoldFixed-v0_4.monitor.csv
++++ b/logs/myoHandWheelHoldFixed-v0_4.monitor.csv
+@@ -1,30 +1,29 @@
+-#{"t_start": 1753224773.9626968, "env_id": "myoHandWheelHoldFixed-v0"}
++#{"t_start": 1753290010.7394538, "env_id": "myoHandWheelHoldFixed-v0"}
+ r,l,t
+-1025.027865,75,1.416231
+-1007.256683,75,2.047316
+-1021.505493,75,2.652097
+-1015.544931,75,3.269849
+-1021.520222,75,3.872577
+-1020.774244,75,4.499275
+-1017.610995,75,5.191175
+-1016.166897,75,5.896715
+-1017.04601,75,6.530704
+-1010.781994,75,7.172866
+-1021.795854,75,7.894444
+-1017.652139,75,8.53659
+-1021.952054,75,9.164541
+-1008.771898,75,9.876383
+-1010.568484,75,10.735241
+-1015.405277,75,11.613652
+-1015.257161,75,12.566642
+-1009.432448,75,13.405201
+-1021.427443,75,14.23542
+-1024.045203,75,15.067734
+-1014.62946,75,15.884056
+-1019.447596,75,16.746597
+-1016.557287,75,17.420751
+-1021.865125,75,18.115515
+-1014.994007,75,18.724026
+-1024.000069,75,19.360716
+-1012.328282,75,19.985709
+-1032.681333,75,36.941339
++662.168583,75,1.612726
++665.334623,75,2.280487
++653.269943,75,2.931234
++652.562604,75,3.565899
++659.320887,75,4.209894
++659.002267,75,4.855948
++658.773379,75,5.508761
++661.459529,75,6.165328
++660.96231,75,6.812074
++657.099158,75,7.475199
++664.405081,75,8.155205
++650.937342,75,8.854627
++657.79846,75,9.498847
++661.996047,75,10.157167
++661.040694,75,10.800202
++660.185896,75,11.45986
++663.095998,75,12.109488
++652.635899,75,12.77485
++659.835194,75,13.402992
++649.189549,75,14.076609
++663.421021,75,14.732759
++660.364366,75,15.38576
++657.244177,75,16.09124
++664.071917,75,16.757658
++661.895829,75,17.406895
++664.071153,75,18.070929
++665.477871,75,18.723945
+diff --git a/logs/myoHandWheelHoldFixed-v0_5.monitor.csv b/logs/myoHandWheelHoldFixed-v0_5.monitor.csv
+index 569533d..1c9bae7 100644
+--- a/logs/myoHandWheelHoldFixed-v0_5.monitor.csv
++++ b/logs/myoHandWheelHoldFixed-v0_5.monitor.csv
+@@ -1,30 +1,29 @@
+-#{"t_start": 1753224774.0341969, "env_id": "myoHandWheelHoldFixed-v0"}
++#{"t_start": 1753290010.8031416, "env_id": "myoHandWheelHoldFixed-v0"}
+ r,l,t
+-1013.61444,75,1.343731
+-1009.870372,75,1.976817
+-1011.110782,75,2.580597
+-1009.205111,75,3.199347
+-1008.714985,75,3.801077
+-995.283846,75,4.427775
+-1015.766284,75,5.121675
+-1009.971937,75,5.82722
+-1013.728506,75,6.459204
+-1016.10202,75,7.101366
+-1017.371848,75,7.822944
+-1013.015825,75,8.46509
+-1023.569169,75,9.093041
+-1015.788413,75,9.803874
+-1016.122623,75,10.66875
+-1019.586756,75,11.543143
+-1014.751098,75,12.494141
+-1021.837124,75,13.3327
+-1012.06654,75,14.162922
+-1018.630665,75,14.998234
+-1016.545357,75,15.812556
+-1006.306854,75,16.677098
+-1013.127392,75,17.350252
+-1003.220007,75,18.043014
+-1013.604829,75,18.654527
+-1024.187038,75,19.287214
+-1015.425385,75,19.914209
+-1032.681333,75,36.868812
++655.68768,75,1.550397
++664.265938,75,2.21478
++644.115231,75,2.867546
++665.266453,75,3.504231
++659.608508,75,4.146207
++655.03736,75,4.79226
++658.23892,75,5.445074
++665.928141,75,6.10164
++662.955698,75,6.750403
++659.562063,75,7.413526
++651.613238,75,8.091517
++660.994766,75,8.790939
++665.164158,75,9.435159
++656.283821,75,10.095496
++654.467425,75,10.736514
++669.260493,75,11.398182
++664.155975,75,12.0458
++659.323514,75,12.713174
++651.74771,75,13.343192
++656.232507,75,14.014956
++649.067011,75,14.669071
++657.973621,75,15.322072
++654.795341,75,16.027552
++648.553724,75,16.69397
++655.806716,75,17.346237
++651.005373,75,18.009423
++658.666725,75,18.660257
+diff --git a/logs/myoHandWheelHoldFixed-v0_6.monitor.csv b/logs/myoHandWheelHoldFixed-v0_6.monitor.csv
+index 09bceb7..d573511 100644
+--- a/logs/myoHandWheelHoldFixed-v0_6.monitor.csv
++++ b/logs/myoHandWheelHoldFixed-v0_6.monitor.csv
+@@ -1,30 +1,29 @@
+-#{"t_start": 1753224774.0225222, "env_id": "myoHandWheelHoldFixed-v0"}
++#{"t_start": 1753290010.7873795, "env_id": "myoHandWheelHoldFixed-v0"}
+ r,l,t
+-1009.556028,75,1.355406
+-1020.352474,75,1.98749
+-1017.684381,75,2.592272
+-1016.065644,75,3.210023
+-1012.117398,75,3.812752
+-1022.143674,75,4.439449
+-1012.488937,75,5.130339
+-1024.697259,75,5.83589
+-1012.505855,75,6.469879
+-1019.75989,75,7.11404
+-1007.471809,75,7.836618
+-1013.16939,75,8.477757
+-1017.637341,75,9.104716
+-1018.783097,75,9.816557
+-1012.359145,75,10.680424
+-1022.594206,75,11.553826
+-1018.80107,75,12.505816
+-1023.706493,75,13.344374
+-1014.852135,75,14.176598
+-1019.786124,75,15.009909
+-1010.253725,75,15.823231
+-1025.784169,75,16.685769
+-1013.528804,75,17.360925
+-1027.666169,75,18.054688
+-1024.678987,75,18.664201
+-1023.147914,75,19.29989
+-1014.01703,75,19.926884
+-1032.681333,75,36.882523
++650.126593,75,1.566159
++650.904432,75,2.232561
++660.777828,75,2.885311
++664.579395,75,3.517973
++658.543441,75,4.161969
++653.296806,75,4.808022
++659.816321,75,5.460836
++652.771659,75,6.117402
++659.097381,75,6.764148
++656.58293,75,7.427274
++653.451488,75,8.107279
++661.80362,75,8.806701
++660.911583,75,9.450921
++660.214186,75,10.109241
++669.01838,75,10.752276
++660.95935,75,11.411934
++666.408114,75,12.061562
++662.992807,75,12.728936
++661.47763,75,13.355067
++660.395092,75,14.028683
++665.885002,75,14.686958
++662.700892,75,15.337834
++658.628424,75,16.045339
++668.527621,75,16.709732
++657.348888,75,17.358969
++658.874161,75,18.023003
++655.736391,75,18.676019
+diff --git a/logs/myoHandWheelHoldFixed-v0_7.monitor.csv b/logs/myoHandWheelHoldFixed-v0_7.monitor.csv
+index 4a78309..832e859 100644
+--- a/logs/myoHandWheelHoldFixed-v0_7.monitor.csv
++++ b/logs/myoHandWheelHoldFixed-v0_7.monitor.csv
+@@ -1,30 +1,29 @@
+-#{"t_start": 1753224773.9938774, "env_id": "myoHandWheelHoldFixed-v0"}
++#{"t_start": 1753290010.7699142, "env_id": "myoHandWheelHoldFixed-v0"}
+ r,l,t
+-1024.632091,75,1.38605
+-1021.527931,75,2.017136
+-1017.972814,75,2.619916
+-1024.591147,75,3.238668
+-1019.046291,75,3.8424
+-1022.528901,75,4.466096
+-1010.187962,75,5.158984
+-1012.296401,75,5.86754
+-1014.07443,75,6.499524
+-1015.845939,75,7.141685
+-1019.568136,75,7.867259
+-1012.484834,75,8.505409
+-1015.835783,75,9.132359
+-1023.017029,75,9.843191
+-1011.967579,75,10.711374
+-1022.176196,75,11.582471
+-1009.925649,75,12.534461
+-1007.46589,75,13.373019
+-1022.536174,75,14.204239
+-1020.324498,75,15.038554
+-1003.734591,75,15.851875
+-1014.660883,75,16.717417
+-1013.068754,75,17.39157
+-1013.579878,75,18.084335
+-1015.195803,75,18.693845
+-1025.608438,75,19.329536
+-1020.737955,75,19.954529
+-1032.681333,75,36.911168
++656.092366,75,1.583625
++656.196317,75,2.252053
++664.503687,75,2.900774
++660.928061,75,3.537459
++651.245182,75,4.179434
++662.176845,75,4.825488
++655.745341,75,5.478301
++664.382821,75,6.136882
++656.403391,75,6.783631
++652.196052,75,7.446754
++663.672581,75,8.122733
++657.894201,75,8.825796
++662.420145,75,9.468386
++653.894445,75,10.126707
++657.952243,75,10.769742
++655.539116,75,11.4294
++657.510957,75,12.085072
++658.981314,75,12.746402
++658.15649,75,13.376419
++651.718099,75,14.046149
++652.620868,75,14.704423
++649.292658,75,15.357903
++656.436888,75,16.062804
++646.852181,75,16.727197
++666.891432,75,17.37845
++661.87823,75,18.040468
++659.21691,75,18.691285
+diff --git a/logs/myoHandWheelHoldFixed-v0_8.monitor.csv b/logs/myoHandWheelHoldFixed-v0_8.monitor.csv
+index 2732078..eb75d06 100644
+--- a/logs/myoHandWheelHoldFixed-v0_8.monitor.csv
++++ b/logs/myoHandWheelHoldFixed-v0_8.monitor.csv
+@@ -1,30 +1,29 @@
+-#{"t_start": 1753224774.0128736, "env_id": "myoHandWheelHoldFixed-v0"}
++#{"t_start": 1753290010.794798, "env_id": "myoHandWheelHoldFixed-v0"}
+ r,l,t
+-1017.388651,75,1.368562
+-1022.615702,75,1.997139
+-1013.995337,75,2.600919
+-1019.86651,75,3.22067
+-1012.615317,75,3.8224
+-1012.543143,75,4.4471
+-1020.051194,75,5.145996
+-1013.620724,75,5.846539
+-1007.361067,75,6.483528
+-1007.690422,75,7.124691
+-1001.027247,75,7.847264
+-1018.342037,75,8.487406
+-1016.554426,75,9.114364
+-1017.189355,75,9.825198
+-1008.748952,75,10.691065
+-1014.108093,75,11.563475
+-1013.211152,75,12.516465
+-1000.946912,75,13.355024
+-1002.067948,75,14.188247
+-1005.332073,75,15.017557
+-1003.609929,75,15.834881
+-1024.330652,75,16.697423
+-1017.530785,75,17.371575
+-1024.976068,75,18.065338
+-1015.872688,75,18.67585
+-1011.084531,75,19.31154
+-1019.095805,75,19.936533
+-1032.681332,75,36.892172
++655.499495,75,1.560762
++659.272364,75,2.22717
++665.142253,75,2.87589
++659.801417,75,3.512575
++656.99741,75,4.156573
++662.492977,75,4.800604
++656.905184,75,5.453417
++655.69438,75,6.109983
++665.340231,75,6.758747
++656.062487,75,7.42187
++659.16074,75,8.099861
++662.92299,75,8.800912
++662.083433,75,9.443502
++658.447492,75,10.101823
++653.773597,75,10.744858
++663.241955,75,11.406526
++652.029294,75,12.054144
++642.050396,75,12.721518
++667.439899,75,13.351535
++664.106508,75,14.021265
++655.957938,75,14.678468
++657.811852,75,15.330416
++664.014267,75,16.039444
++646.558193,75,16.702314
++663.79138,75,17.351551
++664.458707,75,18.017767
++662.248408,75,18.668601
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index e2abf38..d5bf262 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -93,7 +93,7 @@ if __name__ == "__main__":
+     import multiprocessing
+     multiprocessing.set_start_method("spawn", force=True)
+ 
+-    num_cpu = 9
++    num_cpu = 12
+ 
+     dof_env = ['myoHandWheelHoldFixed-v0']
+ 
+diff --git a/myosuite/envs/myo/myowheelchair/wheelhold_v0_push.py b/myosuite/envs/myo/myowheelchair/wheelhold_v0_push.py
+deleted file mode 100644
+index 735fbd6..0000000
+--- a/myosuite/envs/myo/myowheelchair/wheelhold_v0_push.py
++++ /dev/null
+@@ -1,194 +0,0 @@
+-""" =================================================
+-# Copyright (c) Facebook, Inc. and its affiliates
+-Authors  :: Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano (caggiano@gmail.com)
+-================================================= """
+-
+-## PUSHING WHEELCHAIR ##
+-
+-# TODO traing from 174109, make fin open 0, make wheel rotation 15???
+-
+-import collections
+-import numpy as np
+-import math
+-from myosuite.utils import gym
+-
+-from myosuite.envs.myo.base_v0 import BaseV0
+-
+-
+-class WheelHoldFixedEnvV0(BaseV0):
+-
+-    DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'wheel_angle', 'hand_qpos', 'hand_qvel']
+-    DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+-        "goal_dist": 10.0,
+-        "hand_dist" : 0.0,
+-        "fin_open": -15.0,
+-        "bonus": 0.0,
+-        "penalty": 2.0,
+-        "wheel_rotation": 15.0,
+-        "rotation_bonus": 2.0
+-    }
+-
+-    def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
+-
+-        # EzPickle.__init__(**locals()) is capturing the input dictionary of the init method of this class.
+-        # In order to successfully capture all arguments we need to call gym.utils.EzPickle.__init__(**locals())
+-        # at the leaf level, when we do inheritance like we do here.
+-        # kwargs is needed at the top level to account for injection of __class__ keyword.
+-        # Also see: https://github.com/openai/gym/pull/1497
+-        gym.utils.EzPickle.__init__(self, model_path, obsd_model_path, seed, **kwargs)
+-
+-        # This two step construction is required for pickling to work correctly. All arguments to all __init__
+-        # calls must be pickle friendly. Things like sim / sim_obsd are NOT pickle friendly. Therefore we
+-        # first construct the inheritance chain, which is just __init__ calls all the way down, with env_base
+-        # creating the sim / sim_obsd instances. Next we run through "setup"  which relies on sim / sim_obsd
+-        # created in __init__ to complete the setup.
+-        super().__init__(model_path=model_path, obsd_model_path=obsd_model_path, seed=seed, env_credits=self.MYO_CREDIT)
+-
+-        self._setup(**kwargs)
+-
+-
+-    def _setup(self,
+-            obs_keys:list = DEFAULT_OBS_KEYS,
+-            weighted_reward_keys:list = DEFAULT_RWD_KEYS_AND_WEIGHTS,
+-            **kwargs,
+-        ):
+-        self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
+-        self.palm_r = self.sim.model.site_name2id("palm_r")
+-        self.hand_start_right = self.sim.model.site_name2id("hand_start_right")
+-        self.rail_bottom_right = self.sim.model.site_name2id("rail_bottom_right")
+-
+-        # define the palm and tip site id.
+-        # self.palm_r = self.sim.model.site_name2id('S_grasp')
+-        self.init_palm_z = self.sim.data.site_xpos[self.palm_r][-1]
+-        self.fin0 = self.sim.model.site_name2id("THtip")
+-        self.fin1 = self.sim.model.site_name2id("IFtip")
+-        self.fin2 = self.sim.model.site_name2id("MFtip")
+-        self.fin3 = self.sim.model.site_name2id("RFtip")
+-        self.fin4 = self.sim.model.site_name2id("LFtip")
+-
+-        self.wheel_joint_id = self.sim.model.joint_name2id("right_rear")
+-        self.init_wheel_angle = self.sim.data.qpos[self.wheel_joint_id]
+-
+-
+-        #self.goal_sid_left = self.sim.model.site_name2id("wheel_grip_goal_left")
+-        #self.object_init_pos = self.sim.data.site_xpos[self.object_sid].copy()
+-
+-        super()._setup(obs_keys=obs_keys,
+-                    weighted_reward_keys=weighted_reward_keys,
+-                    **kwargs,
+-        )
+-        
+-        self.init_qpos = self.sim.model.key_qpos[0].copy() # copy the sitting + grabbing wheels keyframe
+-
+-
+-    def get_obs_vec(self):
+-        self.obs_dict['time'] = np.array([self.sim.data.time])
+-        self.obs_dict['hand_qpos'] = self.sim.data.qpos[13:].copy()
+-        self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:].copy()*self.dt
+-        #self.obs_dict['wheel_pos'] = self.sim.data.site_xpos[self.object_sid]
+-        self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
+-        self.obs_dict['hand_initpos_err_right'] = self.sim.data.site_xpos[self.hand_start_right]- self.sim.data.site_xpos[self.goal_sid_right]
+-
+-        self.obs_dict["palm_pos"] = self.sim.data.site_xpos[self.palm_r]
+-        self.obs_dict['fin0'] = self.sim.data.site_xpos[self.fin0]
+-        self.obs_dict['fin1'] = self.sim.data.site_xpos[self.fin1]
+-        self.obs_dict['fin2'] = self.sim.data.site_xpos[self.fin2]
+-        self.obs_dict['fin3'] = self.sim.data.site_xpos[self.fin3]
+-        self.obs_dict['fin4'] = self.sim.data.site_xpos[self.fin4]
+-
+-        self.obs_dict["rail_bottom_right"] = self.sim.data.site_xpos[self.rail_bottom_right]
+-
+-        self.obs_dict['wheel_angle'] = np.array([self.sim.data.qpos[self.wheel_joint_id]])
+-
+-
+-        if self.sim.model.na>0:
+-            self.obs_dict['act'] = self.sim.data.act[:].copy()
+-
+-        t, obs = self.obsdict2obsvec(self.obs_dict, self.obs_keys)
+-        return obs
+-
+-    def get_obs_dict(self, sim):
+-        obs_dict = {}
+-        obs_dict['time'] = np.array([sim.data.time])
+-        obs_dict['hand_qpos'] = sim.data.qpos[13:].copy()
+-        obs_dict['hand_qvel'] = sim.data.qvel[12:].copy()*self.dt
+-        #obs_dict['wheel_pos'] = sim.data.site_xpos[self.object_sid]
+-        #obs_dict['wheelchair_grip_right'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+-        obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid_right] - sim.data.site_xpos[self.palm_r]
+-        obs_dict['hand_initpos_err_right'] = sim.data.site_xpos[self.hand_start_right]- sim.data.site_xpos[self.goal_sid_right]
+-        #add the initial and end target points
+-        #could add the fingertips here,
+-        obs_dict["palm_pos"] = sim.data.site_xpos[self.palm_r]
+-        obs_dict['fin0'] = sim.data.site_xpos[self.fin0]
+-        obs_dict['fin1'] = sim.data.site_xpos[self.fin1]
+-        obs_dict['fin2'] = sim.data.site_xpos[self.fin2]
+-        obs_dict['fin3'] = sim.data.site_xpos[self.fin3]
+-        obs_dict['fin4'] = sim.data.site_xpos[self.fin4]
+-
+-        obs_dict["rail_bottom_right"] = sim.data.site_xpos[self.rail_bottom_right]
+-
+-        obs_dict['wheel_angle'] = np.array([sim.data.qpos[self.wheel_joint_id]])
+-
+-
+-        #obs_dict['wheel_err_left'] = sim.data.site_xpos[self.goal_sid] - sim.data.site_xpos[self.object_sid]
+-        if sim.model.na>0:
+-            obs_dict['act'] = sim.data.act[:].copy()
+-        
+-        return obs_dict
+-
+-    def get_reward_dict(self, obs_dict):
+-        dist_right = np.linalg.norm(obs_dict['wheel_err_right'])
+-        hand_initpos_err_right = np.linalg.norm(obs_dict['hand_initpos_err_right'])
+-
+-        #for wheel rotation
+-        wheel_angle_now = self.sim.data.qpos[self.wheel_joint_id]
+-        wheel_rotation = wheel_angle_now - self.init_wheel_angle
+-        wheel_target = np.pi / 2  # 90 degrees
+-
+-        wheel_rotation_err = abs(wheel_rotation - wheel_target)
+-        wheel_rotation_rwd = math.exp(-5.0 * wheel_rotation_err)
+-
+-        
+-        
+-        act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
+-        drop = dist_right > 0.500
+-
+-        fin_keys = ['fin0', 'fin1', 'fin2', 'fin3', 'fin4']
+-        # for fin in fin_keys:
+-        #     print(fin, type(obs_dict[fin]), np.shape(obs_dict[fin]))
+-        fin_open = sum(
+-            np.linalg.norm(obs_dict[fin].squeeze() - obs_dict['rail_bottom_right'].squeeze(), axis=-1)
+-            for fin in fin_keys
+-        )
+-        
+-        # grip_right = self._check_hand_grip_contact(
+-        #     hand_geom_names=["right_index_tip", "right_thumb_tip"],
+-        #     wheel_geom_names=[f"handrail_coll{i}" for i in range(1, 17)]
+-        # )
+-
+-        rwd_dict = collections.OrderedDict((
+-            ('goal_dist', math.exp(-2.0*abs(dist_right))), #exp(- k * abs(x))
+-            ('hand_dist', math.exp(-1.0*abs(hand_initpos_err_right))),
+-            ('bonus', 1.*(dist_right<2*0) + 1.*(dist_right<0)),
+-            ('act_reg', -1.*act_mag),
+-            ("fin_open", np.exp(-20 * fin_open)),  # fin_open + np.log(fin_open +1e-8)
+-
+-            #('grip_bonus', 1.0 * grip_right),
+-            ('penalty', -1.*drop),
+-            ('sparse', dist_right < 0.055),
+-            #('sparse', 1.0 * grip_right - dist_right),
+-            ('solved', dist_right < 0.001 and wheel_rotation_err < 0.05),
+-            #('solved', grip_right and dist_right < 0.015),
+-            ('done', dist_right > 0.9),
+-            ('wheel_rotation', wheel_rotation_rwd),
+-            ('rotation_bonus', 1.0 if wheel_rotation_err < 0.05 else 0.0),
+-        ))
+-        
+-        rwd_dict['dense'] = np.sum([wt*rwd_dict[key] for key, wt in self.rwd_keys_wt.items()], axis=0)
+-        
+-        return rwd_dict
+-    
+-    def reset(self, **kwargs):
+-        self.robot.sync_sims(self.sim, self.sim_obsd)
+-        obs = super().reset(**kwargs)
+-        return obs

@@ -19,7 +19,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         "hand_dist" : 5.0,
         "fin_open": 15.0,
         "bonus": 0.0,
-        "penalty": 2,
+        "penalty": 2.0,
         "wheel_rotation": 0.0,
         "rotation_bonus": 0.0
     }
@@ -48,10 +48,10 @@ class WheelHoldFixedEnvV0(BaseV0):
             weighted_reward_keys: dict = None,  # unused now
             **kwargs,
         ):
-        self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right")
+        self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right") #green, movable
         self.palm_r = self.sim.model.site_name2id("palm_r")
-        self.hand_start_right = self.sim.model.site_name2id("hand_start_right")
-        self.rail_bottom_right = self.sim.model.site_name2id("rail_bottom_right")
+        self.hand_start_right = self.sim.model.site_name2id("hand_start_right") #red, static
+        self.rail_bottom_right = self.sim.model.site_name2id("rail_bottom_right") #blue, movable
 
         # define the palm and tip site id.
         # self.palm_r = self.sim.model.site_name2id('S_grasp')
