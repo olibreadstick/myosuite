@@ -11,11 +11,11 @@ if __name__ == "__main__":
     env.reset()
 
     model = PPO("MlpPolicy", env, verbose=0)
-    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_23_20_11_28\best_model.zip")
+    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_24_02_31_48\best_model.zip")
 
     # render
     frames = []
-    for _ in range(500):
+    for _ in range(800):
         frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=0)) 
         o = env.get_obs()
         a = pi.predict(o)[0]
