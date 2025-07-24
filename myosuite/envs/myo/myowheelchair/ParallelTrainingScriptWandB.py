@@ -39,21 +39,31 @@ def make_env(env_name, idx, seed=0):
 
 curr_dir = os.path.dirname(os.path.abspath(__file__))
 
-def record_video(env_name, model_path=curr_dir+'/WheelDist_policy', out_path=curr_dir+"/videos/Wheel_MinDist.mp4"):
-    env = gym.make(env_name)
+def record_video(env_name, log_path):
+    env = gym.make('myoHandWheelHoldFixed-v0')
     env.reset()
-    #model = PPO.load(model_path)
-    model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
-            policy_kwargs=policy_kwargs,
-            tensorboard_log=f"runs/{time_now}")   
+
+    # model = PPO("MlpPolicy", env, verbose=0)
+    model_path = log_path
+
+    pi = PPO.load(model_path)
+
+    # render
     frames = []
-    for _ in range(300):
-        frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=0))
-        obs = env.get_obs()
-        action, _ = model.predict(obs)
-        env.step(action)
-    os.makedirs("videos", exist_ok=True)
-    skvideo.io.vwrite(out_path, np.asarray(frames), outputdict={"-pix_fmt": "yuv420p", "-r": "10"})
+    for _ in range(500):
+        frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=0)) 
+        o = env.get_obs()
+        a = pi.predict(o)[0]
+        next_o, r, done, *_, ifo = env.step(
+            a
+        )  # take an action based on the current observation
+
+    # make a local copy
+    skvideo.io.vwrite(
+        curr_dir+"/videos/Curr_Best.mp4",
+        np.asarray(frames),
+        outputdict={"-pix_fmt": "yuv420p", "-r": "10"},
+    )
 
 def linear_schedule(initial_value: float) -> Callable[[float], float]:
     """
@@ -132,7 +142,8 @@ if __name__ == "__main__":
             "loaded_model": 'NA',
         }
         #config = {**config, **envs.rwd_keys_wt}
-        run = wandb.init(project="myoHandWheelHoldFixed-v0",
+        run = wandb.init(
+                        project="myoHandWheelHoldFixed-v0",
                         entity="oliviacardillo-mcgill-university",
                         group=args.group,
                         settings=wandb.Settings(start_method="thread"),
@@ -161,17 +172,14 @@ if __name__ == "__main__":
     }
 
 
-
-
-
     print("Begin training")
 
     model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
             policy_kwargs=policy_kwargs,
             tensorboard_log=f"runs/{time_now}")
     
-    # # TODO TRY LOADING
-    # model_num =   '2025_07_21_17_13_37'
+    # TODO TRY LOADING
+    # model_num =   '2025_07_23_19_37_27'
     # model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
 
     obs_callback = TensorboardCallback()
@@ -180,9 +188,6 @@ if __name__ == "__main__":
     #TODO TOTAL TIMESTEPS HERE
     model.learn(total_timesteps=1e6, tb_log_name=env_name + "_" + time_now, callback=callback)
     model.save(curr_dir+'/WheelDist_policy')
-
-    # Record video after training
-    record_video(env_name)
 
     # evaluate policy
     all_rewards = []
@@ -200,3 +205,6 @@ if __name__ == "__main__":
     print("All episode rewards:", all_rewards)
     print(f"Average reward: {np.mean(all_rewards)} over 5 episodes")
     all_rewards
+
+    # # Record video after training
+    # record_video(env_name, log_path)

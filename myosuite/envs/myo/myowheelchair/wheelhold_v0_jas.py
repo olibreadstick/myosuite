@@ -13,14 +13,14 @@ from myosuite.envs.myo.base_v0 import BaseV0
 
 class WheelHoldFixedEnvV0(BaseV0):
 
-    DEFAULT_OBS_KEYS = ['time', 'wheel_err_right', 'wheel_angle', 'hand_qpos', 'hand_qvel', 'task_phase']
+    DEFAULT_OBS_KEYS = ['time', 'wheel_angle', 'hand_qpos', 'hand_qvel', 'task_phase']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
-        "return_reward": 15.0,
-        "hand_err_reward": 15.0,
+        "return_rwd": 10.0,
+        "hand_err_rwd": 10.0,
 
         "dist_reward": 5.0,
         "palm_touch_rwd": 5.0,
-        "wheel_rotation": 20.0,
+        "wheel_rotation": 25.0,
         "fin_open": -2.0,
 
         "bonus": 1.0, 
@@ -76,6 +76,7 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         #phases check
         self.task_phase = "push"
+        # self.prev_rwd_dict = None
 
         super()._setup(obs_keys=obs_keys,
                     weighted_reward_keys=weighted_reward_keys,
@@ -142,7 +143,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         obs_dict['hand_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_TARGET_right]
 
         #calculate palm to return position
-        self.obs_dict['return_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_start_right]
+        obs_dict['return_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_start_right]
 
         if sim.model.na>0:
             obs_dict['act'] = sim.data.act[:].copy()
@@ -196,73 +197,56 @@ class WheelHoldFixedEnvV0(BaseV0):
         hand_err = np.linalg.norm(obs_dict["hand_err"])
         return_err = np.linalg.norm(obs_dict["return_err"])
 
-        # IF ELSE STARTS HERE
-        if self.task_phase == "push" and hand_err < 0.005 and elbow_now < 0.7:
-            print("returning")
-            self.task_phase = "return"
+        # === Compute reward based on phase ===
+        if self.task_phase == "push":
             rwd_dict = collections.OrderedDict((
-                ('return_rwd', math.exp(-20.0*abs(return_err))),
-                ('hand_err_rwd', 0),    
+                ('return_rwd', 0),
+                ('hand_err_rwd', math.exp(-20.0 * abs(hand_err))),
+                ('dist_reward', dist_reward),
+                ('palm_touch_rwd', palm_touch_rwd),
+                ('wheel_rotation', 15.0 * wheel_rotation),
+                ('act_reg', -0.5 * act_mag),
+                ('fin_open', np.exp(-5.0 * fin_open)),
+                ('bonus', 1.0 * (wheel_angle_now < self.init_wheel_angle)),
+                ('penalty', -1.0 * (wheel_angle_now > self.init_wheel_angle)),
+                ('sparse', 0),
+                ('solved', wheel_rotation < -500.0),
+                ('done', wheel_rotation > 500.0),
+            ))
+            if hand_err < 0.001 and elbow_now < 0.7:
+                print("returning")
+                self.task_phase = "return"
 
+        elif self.task_phase == "return":
+            rwd_dict = collections.OrderedDict((
+                ('return_rwd', math.exp(-20.0 * abs(return_err))),
+                ('hand_err_rwd', 0),
                 ('dist_reward', 0),
                 ('palm_touch_rwd', 0),
-                ('wheel_rotation', 0), 
-                ('act_reg', -0.5*act_mag),
-                ("fin_open", 0), 
-
-                # MUST KEYS
-                ('bonus', 0), 
-                ('penalty', 0), 
-                ('sparse', return_err < 0.055),
-                ('solved', 0), 
-                ('done', 0), 
+                ('wheel_rotation', 0),
+                ('act_reg', -0.5 * act_mag),
+                ('fin_open', 0),
+                ('bonus', 0),
+                ('penalty', 0),
+                ('sparse', return_err < 0.025),
+                ('solved', 0),
+                ('done', 0),
             ))
-        elif self.task_phase == "return" and return_err < 0.005 and elbow_now > 1.05:
-            print("return succesful, pushing again")
-            self.task_phase = "push"
-            rwd_dict = collections.OrderedDict((
-                ('return_rwd', 0),
-                ('hand_err_rwd', math.exp(-20.0*abs(hand_err))),    
+            if return_err < 0.001 and elbow_now > 1.08:
+                print("return successful, pushing again")
+                self.task_phase = "push"
 
-                ('dist_reward', dist_reward),
-                ('palm_touch_rwd', palm_touch_rwd),
-                ('wheel_rotation', 15.0*wheel_rotation), #as big as possible
-                ('act_reg', -0.5*act_mag),
-                ("fin_open", np.exp(-5.0*fin_open)), 
-
-                # MUST KEYS
-                ('bonus', 1.*(wheel_angle_now < self.init_wheel_angle)), #if it rotates cw
-                ('penalty', -1.*(wheel_angle_now > self.init_wheel_angle)), #if it rotates ccw
-                ('sparse', 0),
-                ('solved', wheel_rotation < -500.0), #if it rotates cw a lot
-                ('done', wheel_rotation > 500.0), #if it rotates ccw a lot
-            ))
         else:
-            rwd_dict = collections.OrderedDict((
-                ('return_rwd', 0),
-                ('hand_err_rwd', math.exp(-20.0*abs(hand_err))),   
+            raise ValueError(f"Unknown task phase: {self.task_phase}")
 
-                ('dist_reward', dist_reward),
-                ('palm_touch_rwd', palm_touch_rwd),
-                ('wheel_rotation', 15.0*wheel_rotation), #as big as possible
-                ('act_reg', -0.5*act_mag),
-                ("fin_open", np.exp(-5.0*fin_open)), 
-
-                # MUST KEYS
-                ('bonus', 1.*(wheel_angle_now < self.init_wheel_angle)), #if it rotates cw
-                ('penalty', -1.*(wheel_angle_now > self.init_wheel_angle)), #if it rotates ccw
-                ('sparse', 0),
-                ('solved', wheel_rotation < -500.0), #if it rotates cw a lot
-                ('done', wheel_rotation > 500.0), #if it rotates ccw a lot
-            ))
-            
-        
-        rwd_dict['dense'] = np.sum([wt*rwd_dict[key] for key, wt in self.rwd_keys_wt.items()], axis=0)
-        
+        rwd_dict['dense'] = np.sum([wt * rwd_dict[key] for key, wt in self.rwd_keys_wt.items()])
+        # self.prev_rwd_dict = rwd_dict  # Always update
         return rwd_dict
     
     def reset(self, **kwargs):
         self.robot.sync_sims(self.sim, self.sim_obsd)
         obs = super().reset(**kwargs)
+
+        # self.prev_rwd_dict = self.get_reward_dict(self.get_obs_dict(self.sim))  # optional init
         
         return obs
