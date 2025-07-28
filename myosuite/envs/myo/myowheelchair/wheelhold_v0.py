@@ -76,6 +76,8 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         #phases check
         self.task_phase = "push"
+        self.triggered_return_bonus = False
+        self.triggered_push_bonus = False
         # self.prev_rwd_dict = None
 
         super()._setup(obs_keys=obs_keys,
@@ -104,7 +106,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         # self.obs_dict["rail_bottom_right"] = self.sim.data.site_xpos[self.rail_bottom_right]
 
         self.obs_dict['wheel_angle'] = np.array([self.sim.data.qpos[self.wheel_joint_id]])
-        # self.obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
+        self.obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
 
         #calculate palm from target distance
         self.obs_dict['hand_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_TARGET_right]
@@ -137,7 +139,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         # obs_dict["rail_bottom_right"] = sim.data.site_xpos[self.rail_bottom_right]
         obs_dict['wheel_angle'] = np.array([sim.data.qpos[self.wheel_joint_id]])
 
-        # obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
+        obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
 
         #calculate palm from target distance
         obs_dict['hand_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_TARGET_right]
@@ -199,6 +201,11 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         # === Compute reward based on phase ===
         if self.task_phase == "push":
+            print(f"[Push Phase] hand_err: {hand_err:.4f}, elbow: {elbow_now:.4f}, wheel: {wheel_rotation:.4f}")
+
+            triggered_return =  hand_err < 0.05 and wheel_rotation < -0.0012
+            bonus_reward = 300.0 if (triggered_return and not self.triggered_return_bonus) else 0.0
+
             rwd_dict = collections.OrderedDict((
                 ('return_rwd', 0),
                 ('hand_err_rwd', math.exp(-20.0 * abs(hand_err))),
@@ -207,7 +214,7 @@ class WheelHoldFixedEnvV0(BaseV0):
                 ('wheel_rotation', 15.0 * wheel_rotation),
                 ('act_reg', -0.5 * act_mag),
                 ('fin_open', np.exp(-5.0 * fin_open)),
-                ('bonus', 1.0 * (wheel_angle_now < self.init_wheel_angle)),
+                ('bonus', 5.0 * (wheel_angle_now < self.init_wheel_angle) + bonus_reward),
                 ('penalty', -1.0 * (wheel_angle_now > self.init_wheel_angle)),
                 ('sparse', 0),
                 ('solved', 0),
@@ -215,20 +222,28 @@ class WheelHoldFixedEnvV0(BaseV0):
                 # ('solved', wheel_rotation < -500.0),
                 # ('done', wheel_rotation > 500.0),
             ))
-            if hand_err < 0.005 and elbow_now < 0.74:
+            
+            if triggered_return and not self.triggered_return_bonus:
                 print("returning")
                 self.task_phase = "return"
+                self.triggered_return_bonus = True  # Prevent repeating the bonus
+                self.triggered_push_bonus = False
 
         elif self.task_phase == "return":
+            print(f"[Return] err: {return_err:.3f}, elbow: {elbow_now:.4f}, wheel: {wheel_rotation:.4f}")
+
+            triggered_push = return_err < 0.05
+            bonus_reward = 500.0 if triggered_push and not self.triggered_push_bonus else 0.0
+
             rwd_dict = collections.OrderedDict((
-                ('return_rwd', math.exp(-20.0 * abs(return_err))),
+                ('return_rwd', math.exp(-50.0 * abs(return_err))),
                 ('hand_err_rwd', 0),
                 ('dist_reward', 0.5*dist_reward),
                 ('palm_touch_rwd', 0),
                 ('wheel_rotation', 0),
                 ('act_reg', -0.25 * act_mag),
                 ('fin_open', np.exp(fin_open)),
-                ('bonus', 0),
+                ('bonus', 5.0 * (return_err < 0.01)+ bonus_reward),
                 ('penalty', 0),
                 ('sparse', return_err < 0.025),
                 ('solved', 0),
@@ -236,10 +251,11 @@ class WheelHoldFixedEnvV0(BaseV0):
                 # ('solved', return_err < 0.0025),
                 # ('done', return_err > 50.0),
             ))
-            if return_err < 0.005 and elbow_now > 1.0:
+            if return_err < 0.05 and elbow_now < -1.0:
                 print("return successful, pushing again")
                 self.task_phase = "push"
-
+                self.triggered_push_bonus = True  # prevent repeat bonus
+                self.triggered_return_bonus = False  # reset for next cycle
         else:
             raise ValueError(f"Unknown task phase: {self.task_phase}")
 

@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
     dof_env = ['myoHandWheelHoldFixed-v0']
 
-    training_steps = 5e5
+    training_steps = 1e6
     #wandb
     for env_name in dof_env:
         print('Begin training')
@@ -179,14 +179,14 @@ if __name__ == "__main__":
             tensorboard_log=f"runs/{time_now}")
     
     # TODO TRY LOADING
-    # model_num =   '2025_07_23_19_37_27'
+    # model_num =  '2025_07_24_15_16_38'
     # model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
 
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
 
     #TODO TOTAL TIMESTEPS HERE
-    model.learn(total_timesteps=2e6, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.learn(total_timesteps=1e6, tb_log_name=env_name + "_" + time_now, callback=callback)
     model.save(curr_dir+'/WheelDist_policy')
 
     # evaluate policy

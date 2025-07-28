@@ -1,0 +1,34 @@
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index ff12bd1..3caf525 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -186,7 +186,7 @@ if __name__ == "__main__":
+     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
+ 
+     #TODO TOTAL TIMESTEPS HERE
+-    model.learn(total_timesteps=2e6, tb_log_name=env_name + "_" + time_now, callback=callback)
++    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+     model.save(curr_dir+'/WheelDist_policy')
+ 
+     # evaluate policy
+diff --git a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+index 9be8803..374abd7 100644
+--- a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
++++ b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+@@ -215,6 +215,7 @@ class WheelHoldFixedEnvV0(BaseV0):
+                 # ('solved', wheel_rotation < -500.0),
+                 # ('done', wheel_rotation > 500.0),
+             ))
++            print(f"[Push Phase] hand_err: {hand_err:.4f}, elbow: {elbow_now:.4f}")
+             if hand_err < 0.005 and elbow_now < 0.74:
+                 print("returning")
+                 self.task_phase = "return"
+@@ -228,7 +229,7 @@ class WheelHoldFixedEnvV0(BaseV0):
+                 ('wheel_rotation', 0),
+                 ('act_reg', -0.25 * act_mag),
+                 ('fin_open', np.exp(fin_open)),
+-                ('bonus', 0),
++                ('bonus', 5.0 * (return_err < 0.01)),
+                 ('penalty', 0),
+                 ('sparse', return_err < 0.025),
+                 ('solved', 0),
