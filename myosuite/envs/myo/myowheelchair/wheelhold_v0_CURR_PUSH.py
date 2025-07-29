@@ -201,10 +201,10 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         # === Compute reward based on phase ===
         if self.task_phase == "push":
-            print(f"[Push Phase] hand_err: {hand_err:.4f}, elbow: {elbow_now:.4f}, wheel: {wheel_rotation:.4f}")
+            # print(f"[Push Phase] hand_err: {hand_err:.4f}, elbow: {elbow_now:.4f}, wheel: {wheel_rotation:.4f}")
 
             triggered_return =  hand_err < 0.05 and wheel_rotation < -0.0012
-            bonus_reward = 300.0 if (triggered_return and not self.triggered_return_bonus) else 0.0
+            bonus_reward = 200.0 if (triggered_return and not self.triggered_return_bonus) else 0.0
 
             rwd_dict = collections.OrderedDict((
                 ('return_rwd', 0),
@@ -230,22 +230,22 @@ class WheelHoldFixedEnvV0(BaseV0):
                 self.triggered_push_bonus = False
 
         elif self.task_phase == "return":
-            print(f"[Return] err: {return_err:.3f}, elbow: {elbow_now:.4f}, wheel: {wheel_rotation:.4f}")
+            # print(f"[Return] err: {return_err:.3f}, elbow: {elbow_now:.4f}, wheel: {wheel_rotation:.4f}")
 
             triggered_push = return_err < 0.05
-            bonus_reward = 500.0 if triggered_push and not self.triggered_push_bonus else 0.0
+            bonus_reward = 400.0 if triggered_push and not self.triggered_push_bonus else 0.0
 
             rwd_dict = collections.OrderedDict((
-                ('return_rwd', math.exp(-50.0 * abs(return_err))),
+                ('return_rwd', 5.0*math.exp(-50.0 * abs(return_err))),
                 ('hand_err_rwd', 0),
-                ('dist_reward', 0.5*dist_reward),
+                ('dist_reward', 0),
                 ('palm_touch_rwd', 0),
                 ('wheel_rotation', 0),
                 ('act_reg', -0.25 * act_mag),
-                ('fin_open', np.exp(fin_open)),
-                ('bonus', 5.0 * (return_err < 0.01)+ bonus_reward),
-                ('penalty', 0),
-                ('sparse', return_err < 0.025),
+                ('fin_open', 0),
+                ('bonus', 1.* (return_err < 0.2)+ bonus_reward),
+                ('penalty', -return_err),
+                ('sparse', return_err < 0.1),
                 ('solved', 0),
                 ('done', 0),
                 # ('solved', return_err < 0.0025),
