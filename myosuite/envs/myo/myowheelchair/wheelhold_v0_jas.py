@@ -201,21 +201,23 @@ class WheelHoldFixedEnvV0(BaseV0):
         hand_err = np.linalg.norm(obs_dict["hand_err"])
         return_err = np.linalg.norm(obs_dict["return_err"])
 
+        drop = return_err>10.0
+
         rwd_dict = collections.OrderedDict((
-            ('return_rwd', math.exp(-2.0 * abs(return_err))),
+            ('return_rwd', 5.0 * np.exp(-10.0 * return_err)),
             ('hand_err_rwd', 0),
             ('dist_reward', 0),
             ('palm_touch_rwd', 0.5*palm_touch_rwd),
             ('wheel_rotation', 0),
-            ('act_reg', -0.5 * act_mag),
+            ('act_reg', -1. * act_mag),
             ('fin_open', 0),
-            ('bonus', 1.0 * (return_err < 0.05)),  # sharper bonus if needed
-            ('penalty', -return_err),
-            ('sparse', return_err < 0.1),
+            ('bonus', 1.*(return_err<2*0.1) + 1.*(return_err<0.1)),
+            ('penalty', -1.*(drop)),
+            ('sparse', -10.0*return_err),
             # ('solved', 0),
             # ('done', 0),
-            ('solved', return_err < 0.0025),
-            ('done', return_err > 50.0),
+            ('solved', (return_err < 0.0025) and (not drop)),
+            ('done', drop),
         ))
         
         rwd_dict['dense'] = np.sum([wt * rwd_dict[key] for key, wt in self.rwd_keys_wt.items()])

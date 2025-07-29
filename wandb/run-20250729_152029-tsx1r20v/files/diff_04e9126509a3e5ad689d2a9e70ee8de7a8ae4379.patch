@@ -1,0 +1,13 @@
+diff --git a/myosuite/envs/myo/myowheelchair/wheelhold_v0_jas.py b/myosuite/envs/myo/myowheelchair/wheelhold_v0_jas.py
+index 7870f67e..863318aa 100644
+--- a/myosuite/envs/myo/myowheelchair/wheelhold_v0_jas.py
++++ b/myosuite/envs/myo/myowheelchair/wheelhold_v0_jas.py
+@@ -215,7 +215,7 @@ class WheelHoldFixedEnvV0(BaseV0):
+             # ('solved', 0),
+             # ('done', 0),
+             ('solved', return_err < 0.0025),
+-            ('done', return_err > 50.0),
++            ('done', return_err > 500.0),
+         ))
+         
+         rwd_dict['dense'] = np.sum([wt * rwd_dict[key] for key, wt in self.rwd_keys_wt.items()])
