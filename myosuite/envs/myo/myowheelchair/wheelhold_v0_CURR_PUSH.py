@@ -43,6 +43,10 @@ class WheelHoldFixedEnvV0(BaseV0):
         # created in __init__ to complete the setup.
         super().__init__(model_path=model_path, obsd_model_path=obsd_model_path, seed=seed, env_credits=self.MYO_CREDIT)
 
+        self.triggered_return_bonus = False
+        self.init_wheel_angle = None
+
+
         self._setup(**kwargs)
 
 
@@ -51,6 +55,9 @@ class WheelHoldFixedEnvV0(BaseV0):
             weighted_reward_keys:list = DEFAULT_RWD_KEYS_AND_WEIGHTS,
             **kwargs,
         ):
+        self.time_step = 0
+        self.return_phase_start = 40
+        
         # self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right") #green, movable
         self.palm_r = self.sim.model.site_name2id("palm_r")
         self.hand_start_right = self.sim.model.site_name2id("hand_start_right") #red, static
@@ -69,15 +76,13 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.fin4 = self.sim.model.site_name2id("LFtip")
 
         self.wheel_joint_id = self.sim.model.joint_name2id("right_rear") #right wheel joint
-        self.init_wheel_angle = self.sim.data.qpos[self.wheel_joint_id].copy() #INIITAL wheel angle
+        #self.init_wheel_angle = self.sim.data.qpos[self.wheel_joint_id].copy() #INIITAL wheel angle
 
         #elbow jnt
         self.elbow_joint_id = self.sim.model.joint_name2id("elbow_flexion")
 
         #phases check
         self.task_phase = "push"
-        self.triggered_return_bonus = False
-        self.triggered_push_bonus = False
         # self.prev_rwd_dict = None
 
         super()._setup(obs_keys=obs_keys,
@@ -86,6 +91,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         )
         
         self.init_qpos = self.sim.model.key_qpos[0].copy() # copy the sitting + grabbing wheels keyframe
+
+
 
 
     def get_obs_vec(self):
@@ -106,7 +113,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         # self.obs_dict["rail_bottom_right"] = self.sim.data.site_xpos[self.rail_bottom_right]
 
         self.obs_dict['wheel_angle'] = np.array([self.sim.data.qpos[self.wheel_joint_id]])
-        self.obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
+        # self.obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
 
         #calculate palm from target distance
         self.obs_dict['hand_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_TARGET_right]
@@ -139,7 +146,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         # obs_dict["rail_bottom_right"] = sim.data.site_xpos[self.rail_bottom_right]
         obs_dict['wheel_angle'] = np.array([sim.data.qpos[self.wheel_joint_id]])
 
-        obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
+        # obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
 
         #calculate palm from target distance
         obs_dict['hand_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_TARGET_right]
@@ -153,6 +160,9 @@ class WheelHoldFixedEnvV0(BaseV0):
         return obs_dict
 
     def get_reward_dict(self, obs_dict):
+        return_phase = self.time_step >= self.return_phase_start
+        
+        
         # palm position from green dot (WARNING: MOVES WITH RAIL)
         # dist_right = np.linalg.norm(obs_dict['wheel_err_right']) 
 
@@ -180,7 +190,14 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         # calculate wheel rotation, just want it as big and negative as possible
         wheel_angle_now = self.sim.data.qpos[self.wheel_joint_id]
+        
+        if self.init_wheel_angle is None:
+             self.init_wheel_angle = wheel_angle_now.copy()
+             print(f"[Fallback] init_wheel_angle was unset, now set to {self.init_wheel_angle:.3f}")
+
+        
         wheel_rotation = -1*(wheel_angle_now - self.init_wheel_angle) #rotate cw? I think?
+
 
         # minimize muscle activation for realism
         act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
@@ -199,12 +216,55 @@ class WheelHoldFixedEnvV0(BaseV0):
         hand_err = np.linalg.norm(obs_dict["hand_err"])
         return_err = np.linalg.norm(obs_dict["return_err"])
 
-        # === Compute reward based on phase ===
+        # if return_phase:
+        # # Return phase: only use return_reward
+        #     return_reward = np.exp(-50.0 * return_err) - 0.5 * return_err
+        #     rwd_dict = collections.OrderedDict((
+        #         ('return_rwd', return_reward),
+        #         ('hand_err_rwd', 0),
+        #         ('dist_reward', 0.5*dist_reward),
+        #         ('palm_touch_rwd', 0),
+        #         ('wheel_rotation', 0),
+        #         ('act_reg', -0.25 * act_mag),
+        #         ('fin_open', np.exp(fin_open)),
+        #         ('bonus', 0),
+        #         ('penalty', 0),
+        #         ('sparse', return_err < 0.025),
+        #         ('solved', 0),
+        #         ('done', 0),
+        #     ))
+        #         # ('solved', return_err < 0.0025),
+        #         # ('done', return_err > 50.0),
+        #     print(f"[Return] Step: {self.time_step}, err: {return_err:.3f}, reward: {return_reward:.3f}")
+        # else:
+        #     # Normal phase: compute all rewards
+        #     rwd_dict = collections.OrderedDict((
+        #         ('return_rwd', 0),
+        #         ('hand_err_rwd', math.exp(-20.0 * abs(hand_err))),
+        #         ('dist_reward', dist_reward),
+        #         ('palm_touch_rwd', palm_touch_rwd),
+        #         ('wheel_rotation', 15.0 * wheel_rotation),
+        #         ('act_reg', -0.5 * act_mag),
+        #         ('fin_open', np.exp(-5.0 * fin_open)),
+        #         ('bonus', 1.0 * (wheel_angle_now < self.init_wheel_angle)),
+        #         ('penalty', -1.0 * (wheel_angle_now > self.init_wheel_angle)),
+        #         ('sparse', 0),
+        #         ('solved', 0),
+        #         ('done', 0)
+        #     ))
+
+    
         if self.task_phase == "push":
             # print(f"[Push Phase] hand_err: {hand_err:.4f}, elbow: {elbow_now:.4f}, wheel: {wheel_rotation:.4f}")
 
+<<<<<<< Updated upstream:myosuite/envs/myo/myowheelchair/wheelhold_v0_CURR_PUSH.py
             triggered_return =  hand_err < 0.05 and wheel_rotation < -0.0012
             bonus_reward = 200.0 if (triggered_return and not self.triggered_return_bonus) else 0.0
+=======
+            #triggered_return =  hand_err < 0.05 and wheel_rotation < -0.0012
+            triggered_return = (abs(wheel_rotation) >= np.deg2rad(0.01))
+            bonus_reward = 300.0 if (triggered_return and not self.triggered_return_bonus) else 0.0
+>>>>>>> Stashed changes:myosuite/envs/myo/myowheelchair/wheelhold_v0.py
 
             rwd_dict = collections.OrderedDict((
                 ('return_rwd', 0),
@@ -223,6 +283,13 @@ class WheelHoldFixedEnvV0(BaseV0):
                 # ('done', wheel_rotation > 500.0),
             ))
             
+            # print(f"[Push] Step: init = {self.init_wheel_angle:.3f}, now = {wheel_angle_now:.3f}, rotation = {wheel_rotation:.3f}")
+            # if abs(wheel_rotation) >= (np.pi / 18):
+            #     print("10 deg reached")
+            #     print("returning")
+            #     self.task_phase = "return"
+            
+            print(f"[Push] Step: init = {self.init_wheel_angle:.6f}, now = {wheel_angle_now:.6f}, rotation = {wheel_rotation:.6f}")
             if triggered_return and not self.triggered_return_bonus:
                 print("returning")
                 self.task_phase = "return"
@@ -251,7 +318,8 @@ class WheelHoldFixedEnvV0(BaseV0):
                 # ('solved', return_err < 0.0025),
                 # ('done', return_err > 50.0),
             ))
-            if return_err < 0.05 and elbow_now < -1.0:
+            #if return_err < 0.05 and elbow_now < -1.0:
+            if elbow_now < -.4:
                 print("return successful, pushing again")
                 self.task_phase = "push"
                 self.triggered_push_bonus = True  # prevent repeat bonus
@@ -266,7 +334,13 @@ class WheelHoldFixedEnvV0(BaseV0):
     def reset(self, **kwargs):
         self.robot.sync_sims(self.sim, self.sim_obsd)
         obs = super().reset(**kwargs)
-
+        self.time_step = 0
         # self.prev_rwd_dict = self.get_reward_dict(self.get_obs_dict(self.sim))  # optional init
-        
+
+        self.init_wheel_angle = self.sim.data.qpos[self.wheel_joint_id].copy()
+
         return obs
+
+    def step(self, action):
+        self.time_step += 1
+        return super().step(action)
