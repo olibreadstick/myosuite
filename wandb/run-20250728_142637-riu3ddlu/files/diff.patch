@@ -1,0 +1,223 @@
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index c8e63b0..b6fa219 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -174,19 +174,19 @@ if __name__ == "__main__":
+ 
+     print("Begin training")
+ 
+-    model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
+-            policy_kwargs=policy_kwargs,
+-            tensorboard_log=f"runs/{time_now}")
++    # model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
++           # policy_kwargs=policy_kwargs,
++           # tensorboard_log=f"runs/{time_now}")
+     
+     # TODO TRY LOADING
+-    # model_num =  '2025_07_24_15_16_38'
+-    # model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
++    model_num =  '2025_07_24_15_22_37_Good'
++    model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
+ 
+     obs_callback = TensorboardCallback()
+     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
+ 
+     #TODO TOTAL TIMESTEPS HERE
+-    model.learn(total_timesteps=1e6, tb_log_name=env_name + "_" + time_now, callback=callback)
++    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+     model.save(curr_dir+'/WheelDist_policy')
+ 
+     # evaluate policy
+diff --git a/myosuite/envs/myo/myowheelchair/render.py b/myosuite/envs/myo/myowheelchair/render.py
+index 4e12e03..d63b853 100644
+--- a/myosuite/envs/myo/myowheelchair/render.py
++++ b/myosuite/envs/myo/myowheelchair/render.py
+@@ -11,7 +11,7 @@ if __name__ == "__main__":
+     env.reset()
+ 
+     model = PPO("MlpPolicy", env, verbose=0)
+-    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_24_15_22_37_Good\best_model.zip")
++    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines/policy_best_model/myoHandWheelHoldFixed-v0/2025_07_24_15_22_37_Good/best_model.zip")
+ 
+     # render
+     frames = []
+diff --git a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4
+index 028cd3b..19c8289 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 and b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+index 0dd7bf9..db666ac 100644
+--- a/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
++++ b/myosuite/envs/myo/myowheelchair/wheelhold_v0.py
+@@ -51,6 +51,9 @@ class WheelHoldFixedEnvV0(BaseV0):
+             weighted_reward_keys:list = DEFAULT_RWD_KEYS_AND_WEIGHTS,
+             **kwargs,
+         ):
++        self.time_step = 0
++        self.return_phase_start = 40
++        
+         # self.goal_sid_right = self.sim.model.site_name2id("wheelchair_grip_right") #green, movable
+         self.palm_r = self.sim.model.site_name2id("palm_r")
+         self.hand_start_right = self.sim.model.site_name2id("hand_start_right") #red, static
+@@ -76,8 +79,6 @@ class WheelHoldFixedEnvV0(BaseV0):
+ 
+         #phases check
+         self.task_phase = "push"
+-        self.triggered_return_bonus = False
+-        self.triggered_push_bonus = False
+         # self.prev_rwd_dict = None
+ 
+         super()._setup(obs_keys=obs_keys,
+@@ -106,7 +107,7 @@ class WheelHoldFixedEnvV0(BaseV0):
+         # self.obs_dict["rail_bottom_right"] = self.sim.data.site_xpos[self.rail_bottom_right]
+ 
+         self.obs_dict['wheel_angle'] = np.array([self.sim.data.qpos[self.wheel_joint_id]])
+-        self.obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
++        # self.obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
+ 
+         #calculate palm from target distance
+         self.obs_dict['hand_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_TARGET_right]
+@@ -139,7 +140,7 @@ class WheelHoldFixedEnvV0(BaseV0):
+         # obs_dict["rail_bottom_right"] = sim.data.site_xpos[self.rail_bottom_right]
+         obs_dict['wheel_angle'] = np.array([sim.data.qpos[self.wheel_joint_id]])
+ 
+-        obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
++        # obs_dict["task_phase"] = np.array([1.0 if self.task_phase == "push" else -1.0])
+ 
+         #calculate palm from target distance
+         obs_dict['hand_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_TARGET_right]
+@@ -153,6 +154,9 @@ class WheelHoldFixedEnvV0(BaseV0):
+         return obs_dict
+ 
+     def get_reward_dict(self, obs_dict):
++        return_phase = self.time_step >= self.return_phase_start
++        
++        
+         # palm position from green dot (WARNING: MOVES WITH RAIL)
+         # dist_right = np.linalg.norm(obs_dict['wheel_err_right']) 
+ 
+@@ -199,13 +203,45 @@ class WheelHoldFixedEnvV0(BaseV0):
+         hand_err = np.linalg.norm(obs_dict["hand_err"])
+         return_err = np.linalg.norm(obs_dict["return_err"])
+ 
++        # if return_phase:
++        # # Return phase: only use return_reward
++        #     return_reward = np.exp(-50.0 * return_err) - 0.5 * return_err
++        #     rwd_dict = collections.OrderedDict((
++        #         ('return_rwd', return_reward),
++        #         ('hand_err_rwd', 0),
++        #         ('dist_reward', 0.5*dist_reward),
++        #         ('palm_touch_rwd', 0),
++        #         ('wheel_rotation', 0),
++        #         ('act_reg', -0.25 * act_mag),
++        #         ('fin_open', np.exp(fin_open)),
++        #         ('bonus', 0),
++        #         ('penalty', 0),
++        #         ('sparse', return_err < 0.025),
++        #         ('solved', 0),
++        #         ('done', 0),
++        #     ))
++        #         # ('solved', return_err < 0.0025),
++        #         # ('done', return_err > 50.0),
++        #     print(f"[Return] Step: {self.time_step}, err: {return_err:.3f}, reward: {return_reward:.3f}")
++        # else:
++        #     # Normal phase: compute all rewards
++        #     rwd_dict = collections.OrderedDict((
++        #         ('return_rwd', 0),
++        #         ('hand_err_rwd', math.exp(-20.0 * abs(hand_err))),
++        #         ('dist_reward', dist_reward),
++        #         ('palm_touch_rwd', palm_touch_rwd),
++        #         ('wheel_rotation', 15.0 * wheel_rotation),
++        #         ('act_reg', -0.5 * act_mag),
++        #         ('fin_open', np.exp(-5.0 * fin_open)),
++        #         ('bonus', 1.0 * (wheel_angle_now < self.init_wheel_angle)),
++        #         ('penalty', -1.0 * (wheel_angle_now > self.init_wheel_angle)),
++        #         ('sparse', 0),
++        #         ('solved', 0),
++        #         ('done', 0)
++        #     ))
++
+         # === Compute reward based on phase ===
+         if self.task_phase == "push":
+-            print(f"[Push Phase] hand_err: {hand_err:.4f}, elbow: {elbow_now:.4f}, wheel: {wheel_rotation:.4f}")
+-
+-            triggered_return =  hand_err < 0.05 and wheel_rotation < -0.0012
+-            bonus_reward = 300.0 if (triggered_return and not self.triggered_return_bonus) else 0.0
+-
+             rwd_dict = collections.OrderedDict((
+                 ('return_rwd', 0),
+                 ('hand_err_rwd', math.exp(-20.0 * abs(hand_err))),
+@@ -214,7 +250,7 @@ class WheelHoldFixedEnvV0(BaseV0):
+                 ('wheel_rotation', 15.0 * wheel_rotation),
+                 ('act_reg', -0.5 * act_mag),
+                 ('fin_open', np.exp(-5.0 * fin_open)),
+-                ('bonus', 5.0 * (wheel_angle_now < self.init_wheel_angle) + bonus_reward),
++                ('bonus', 1.0 * (wheel_angle_now < self.init_wheel_angle)),
+                 ('penalty', -1.0 * (wheel_angle_now > self.init_wheel_angle)),
+                 ('sparse', 0),
+                 ('solved', 0),
+@@ -222,40 +258,34 @@ class WheelHoldFixedEnvV0(BaseV0):
+                 # ('solved', wheel_rotation < -500.0),
+                 # ('done', wheel_rotation > 500.0),
+             ))
+-            
+-            if triggered_return and not self.triggered_return_bonus:
++            if abs(wheel_rotation) >= (np.pi / 18):
++                print("10 deg reached")
+                 print("returning")
+                 self.task_phase = "return"
+-                self.triggered_return_bonus = True  # Prevent repeating the bonus
+-                self.triggered_push_bonus = False
+ 
+         elif self.task_phase == "return":
+-            print(f"[Return] err: {return_err:.3f}, elbow: {elbow_now:.4f}, wheel: {wheel_rotation:.4f}")
+-
+-            triggered_push = return_err < 0.05
+-            bonus_reward = 500.0 if triggered_push and not self.triggered_push_bonus else 0.0
+-
++            return_reward = np.exp(-50.0 * return_err) - 0.5 * return_err
+             rwd_dict = collections.OrderedDict((
+-                ('return_rwd', math.exp(-50.0 * abs(return_err))),
++                ('return_rwd', return_reward),
+                 ('hand_err_rwd', 0),
+                 ('dist_reward', 0.5*dist_reward),
+                 ('palm_touch_rwd', 0),
+                 ('wheel_rotation', 0),
+                 ('act_reg', -0.25 * act_mag),
+                 ('fin_open', np.exp(fin_open)),
+-                ('bonus', 5.0 * (return_err < 0.01)+ bonus_reward),
++                ('bonus', 0),
+                 ('penalty', 0),
+                 ('sparse', return_err < 0.025),
+                 ('solved', 0),
+                 ('done', 0),
+                 # ('solved', return_err < 0.0025),
+                 # ('done', return_err > 50.0),
++                print(f"[Return] Step: {self.time_step}, err: {return_err:.3f}, reward: {return_reward:.3f}")
+             ))
+-            if return_err < 0.05 and elbow_now < -1.0:
++            if return_err < 0.005 and elbow_now > 1.0:
+                 print("return successful, pushing again")
+                 self.task_phase = "push"
+-                self.triggered_push_bonus = True  # prevent repeat bonus
+-                self.triggered_return_bonus = False  # reset for next cycle
++
+         else:
+             raise ValueError(f"Unknown task phase: {self.task_phase}")
+ 
+@@ -266,7 +296,11 @@ class WheelHoldFixedEnvV0(BaseV0):
+     def reset(self, **kwargs):
+         self.robot.sync_sims(self.sim, self.sim_obsd)
+         obs = super().reset(**kwargs)
+-
++        self.time_step = 0
+         # self.prev_rwd_dict = self.get_reward_dict(self.get_obs_dict(self.sim))  # optional init
+-        
+-        return obs
+\ No newline at end of file
++
++        return obs
++
++    def step(self, action):
++        self.time_step += 1
++        return super().step(action)
+\ No newline at end of file

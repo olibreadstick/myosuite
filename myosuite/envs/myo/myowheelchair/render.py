@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     # make a local copy
     skvideo.io.vwrite(
-        curr_dir+"/videos/HandFocusedRender.mp4",
+        curr_dir+"/videos/HandFocusedRender3.mp4",
         np.asarray(frames),
         outputdict={"-pix_fmt": "yuv420p", "-r": "10"},
     )
