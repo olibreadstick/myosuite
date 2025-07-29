@@ -1,0 +1,44 @@
+{
+  "os": "macOS-13.5-arm64-arm-64bit",
+  "python": "CPython 3.12.2",
+  "startedAt": "2025-07-28T21:03:49.793108Z",
+  "program": "/Users/oliviacardillo/myosuite/myosuite3/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py",
+  "codePath": "myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py",
+  "git": {
+    "remote": "https://github.com/olibreadstick/myosuite.git",
+    "commit": "dfc01d0648d7e0b85e72be3ce1565606a721cd6d"
+  },
+  "email": "oliviacardillo@yahoo.ca",
+  "root": "/Users/oliviacardillo/myosuite/myosuite3",
+  "host": "Olivias-MacBook-Air-2.local",
+  "executable": "/opt/anaconda3/bin/python",
+  "codePathLocal": "myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py",
+  "cpu_count": 8,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "373763948544"
+    },
+    "/System/Volumes/Data": {
+      "total": "494384795648",
+      "used": "373763948544"
+    }
+  },
+  "memory": {
+    "total": "17179869184"
+  },
+  "cpu": {
+    "count": 8,
+    "countLogical": 8
+  },
+  "apple": {
+    "name": "Apple M2",
+    "ecpuCores": 4,
+    "pcpuCores": 4,
+    "gpuCores": 10,
+    "memoryGb": 16,
+    "swapTotalBytes": "7516192768",
+    "ramTotalBytes": "17179869184"
+  }
+}
