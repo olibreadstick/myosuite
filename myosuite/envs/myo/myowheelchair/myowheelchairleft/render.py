@@ -13,13 +13,14 @@ if __name__ == "__main__":
     env = gym.make('myoHandWheelHoldFixed-v0_left')
     env.reset()
 
+
     model = PPO("MlpPolicy", env, verbose=0)
-    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_14_15_27/best_model.zip")
+    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_32_32/best_model.zip")
 
     # render
     frames = []
     for _ in range(800):
-        frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=0)) 
+        frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=1)) 
         o = env.get_obs()
         a = pi.predict(o)[0]
         next_o, r, done, *_, ifo = env.step(
@@ -28,7 +29,7 @@ if __name__ == "__main__":
 
     # make a local copy
     skvideo.io.vwrite(
-        curr_dir+"/videos/HandFocusedRender.mp4",
+        curr_dir+"/videos/HandFocusedRender_both.mp4",
         np.asarray(frames),
         outputdict={"-pix_fmt": "yuv420p", "-r": "10"},
     )

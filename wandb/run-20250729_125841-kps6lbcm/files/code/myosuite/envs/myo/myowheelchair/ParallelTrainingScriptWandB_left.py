@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
     dof_env = ['myoHandWheelHoldFixed-v0_left']
 
-    training_steps = 5e5
+    training_steps = 1.5e6
     #wandb
     for env_name in dof_env:
         print('Begin training')
