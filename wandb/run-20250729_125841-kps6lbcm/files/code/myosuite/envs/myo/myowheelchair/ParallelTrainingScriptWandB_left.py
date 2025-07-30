@@ -92,7 +92,7 @@ if __name__ == "__main__":
     import multiprocessing
     multiprocessing.set_start_method("spawn", force=True)
 
-    num_cpu = 9
+    num_cpu = 12
 
     dof_env = ['myoHandWheelHoldFixed-v0_left']
 
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
 
     #TODO TOTAL TIMESTEPS HERE
-    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.learn(total_timesteps=100, tb_log_name=env_name + "_" + time_now, callback=callback)
     model.save(curr_dir+'/WheelDist_policy_left')
 
     # Record video after training

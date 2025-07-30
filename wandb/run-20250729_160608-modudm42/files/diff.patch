@@ -1,0 +1,51 @@
+diff --git a/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/best_model.zip b/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/best_model.zip
+index 6d34dfb..63cb263 100644
+Binary files a/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/best_model.zip and b/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/best_model.zip differ
+diff --git a/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/evaluations.npz b/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/evaluations.npz
+index f872c37..e35fbf6 100644
+Binary files a/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/evaluations.npz and b/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/evaluations.npz differ
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy_left.zip b/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy_left.zip
+index b3aabd3..d387f73 100644
+Binary files a/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy_left.zip and b/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy_left.zip differ
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py b/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
+index 5e50127..a5ee541 100644
+--- a/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
++++ b/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
+@@ -13,7 +13,7 @@ from myosuite.envs.myo.base_v0 import BaseV0
+ 
+ class WheelHoldFixedEnvV0Left(BaseV0):
+ 
+-    DEFAULT_OBS_KEYS = ['time', 'wheel_angle', 'hand_qpos', 'hand_qvel']
++    DEFAULT_OBS_KEYS = ['time', 'wheel_angle', 'hand_qpos', 'hand_qvel', 'wheel_angle_l', 'hand_qpos_l', 'hand_qvel_l']
+     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+         "return_rwd": 30.0,
+         "hand_err_rwd": 10.0,
+@@ -125,12 +125,12 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+ 
+     def get_obs_vec(self):
+         self.obs_dict['time'] = np.array([self.sim.data.time])
+-        self.obs_dict['hand_qpos'] = self.sim.data.qpos[13:].copy()
+-        self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:].copy()*self.dt
++        self.obs_dict['hand_qpos'] = self.sim.data.qpos[13:49].copy()
++        self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:48].copy()*self.dt
+ 
+         self.obs_dict['time'] = np.array([self.sim.data.time])
+-        self.obs_dict['hand_qpos_l'] = self.sim.data.qpos[13:].copy()
+-        self.obs_dict['hand_qvel_l'] = self.sim.data.qvel[12:].copy()*self.dt
++        self.obs_dict['hand_qpos_l'] = self.sim.data.qpos[50:].copy()
++        self.obs_dict['hand_qvel_l'] = self.sim.data.qvel[49:].copy()*self.dt
+ 
+         # self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
+         # self.obs_dict['hand_initpos_err_right'] = self.sim.data.site_xpos[self.hand_start_right]- self.sim.data.site_xpos[self.goal_sid_right]
+diff --git a/wandb/latest-run b/wandb/latest-run
+index 7a4fb5a..4a3c35c 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20250729_155047-lewiqbzd
+\ No newline at end of file
++run-20250729_160608-modudm42
+\ No newline at end of file
+diff --git a/wandb/run-20250729_155047-lewiqbzd/run-lewiqbzd.wandb b/wandb/run-20250729_155047-lewiqbzd/run-lewiqbzd.wandb
+index e69de29..0e0f9c9 100644
+Binary files a/wandb/run-20250729_155047-lewiqbzd/run-lewiqbzd.wandb and b/wandb/run-20250729_155047-lewiqbzd/run-lewiqbzd.wandb differ
