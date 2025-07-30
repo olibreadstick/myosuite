@@ -11,7 +11,7 @@ if __name__ == "__main__":
     env.reset()
 
     model = PPO("MlpPolicy", env, verbose=0)
-    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_29_14_36_29\best_model.zip")
+    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_23_47_52/best_model.zip")
 
     # render
     frames = []

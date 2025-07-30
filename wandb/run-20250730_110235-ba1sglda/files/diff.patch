@@ -1,0 +1,523 @@
+diff --git a/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/best_model.zip b/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/best_model.zip
+index 6d34dfb..63cb263 100644
+Binary files a/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/best_model.zip and b/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/best_model.zip differ
+diff --git a/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/evaluations.npz b/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/evaluations.npz
+index f872c37..e35fbf6 100644
+Binary files a/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/evaluations.npz and b/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_50_49/evaluations.npz differ
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py b/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py
+index e744d79..0d1c251 100644
+--- a/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py
++++ b/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py
+@@ -1,3 +1,305 @@
++import myosuite
++from myosuite.utils import gym
++import numpy as np
++import os
++import torch
++import time
++from datetime import datetime
++from stable_baselines3 import PPO
++from stable_baselines3.common.vec_env import SubprocVecEnv
++from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback, StopTrainingOnRewardThreshold
++from stable_baselines3.common.monitor import Monitor
++from wandb.integration.sb3 import WandbCallback
++import skvideo.io
++from typing import Callable, Dict, List, Optional, Tuple, Type, Union
++import myosuite.envs.myo.myowheelchair.myowheelchairleft
++
++import argparse
++parser = argparse.ArgumentParser(description="Main script to train an agent")
++
++parser.add_argument("--seed", type=int, default=0, help="Seed for random number generator")
++parser.add_argument("--num_envs", type=int, default=1, help="Number of parallel environments")
++parser.add_argument("--env_name", type=str, default='myoStandingBack-v0', help="environment name")
++parser.add_argument("--group", type=str, default='testing', help="group name")
++parser.add_argument("--learning_rate", type=float, default=0.0005, help="Learning rate for the optimizer")
++parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range for the policy gradient update")
++parser.add_argument("--algo", type=str, default='PPO', help="algorithm for training")
++
++
++args = parser.parse_args()
++
++
++def make_env(env_name, idx, seed=0):
++    def _init():
++        env = gym.make(env_name)
++        env.seed(seed + idx)
++        log_dir = f"./logs/{env_name}_{idx}"
++        env = Monitor(env, filename=log_dir)
++        return env
++    return _init
++
++curr_dir = os.path.dirname(os.path.abspath(__file__))
++
++def record_video(env_name, model_path=curr_dir+'/WheelDist_policy_left', out_path=curr_dir+"/videos/Wheel_MinDist_left.mp4"):
++    env = gym.make(env_name)
++    env.reset()
++
++    # model = PPO("MlpPolicy", env, verbose=0)
++    model_path = log_path
++
++    pi = PPO.load(model_path + "best_model")
++
++    # render
++    frames = []
++    for _ in range(500):
++        frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=0)) 
++        o = env.get_obs()
++        a = pi.predict(o)[0]
++        next_o, r, done, *_, ifo = env.step(
++            a
++        )  # take an action based on the current observation
++
++    # make a local copy
++    skvideo.io.vwrite(
++        curr_dir+"/videos/Curr_Best.mp4",
++        np.asarray(frames),
++        outputdict={"-pix_fmt": "yuv420p", "-r": "10"},
++    )
++
++def linear_schedule(initial_value: float) -> Callable[[float], float]:
++    """
++    Linear learning rate schedule.
++
++    :param initial_value: Initial learning rate.
++    :return: schedule that computes
++      current learning rate depending on remaining progress
++    """
++    def func(progress_remaining: float) -> float:
++        """
++        Progress will decrease from 1 (beginning) to 0.
++
++        :param progress_remaining:
++        :return: current learning rate
++        """
++        return progress_remaining * initial_value
++
++    return func
++
++
++class TensorboardCallback(BaseCallback):
++    """
++    Custom callback for plotting additional values in tensorboard.
++    """
++    def __init__(self, verbose=0):
++        super(TensorboardCallback, self).__init__(verbose)
++    def _on_step(self) -> bool:
++        # Log scalar value (here a random variable)
++        value = self.training_env.get_obs_vec()
++        self.logger.record("obs", value)
++
++        return True
++
++
++if __name__ == "__main__":
++    import multiprocessing
++    multiprocessing.set_start_method("spawn", force=True)
++
++    num_cpu = 12
++
++    dof_env = ['myoHandWheelHoldFixed-v0_left']
++
++    training_steps = 5e6
++    #wandb
++    for env_name in dof_env:
++        print('Begin training')
++        ENTROPY = 0.01
++        start_time = time.time()
++        time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
++        time_now = time_now + str(args.seed) + args.algo
++        print(time_now + '\n\n')
++        LR = linear_schedule(args.learning_rate)
++        CR = linear_schedule(args.clip_range)
++
++        IS_WnB_enabled = False
++
++
++    try:
++        import wandb
++        from wandb.integration.sb3 import WandbCallback
++        IS_WnB_enabled = True
++        config = {
++            "policy_type": 'PPO',
++            'name': time_now,
++            "total_timesteps": training_steps,
++            "env_name": env_name,
++            "dense_units": 512,
++            "activation": "relu",
++            "max_episode_steps": 200,
++            "seed": args.seed,
++            "entropy": ENTROPY,
++            "lr": args.learning_rate,
++            "CR": args.clip_range,
++            "num_envs": args.num_envs,
++            "loaded_model": 'NA',
++        }
++        #config = {**config, **envs.rwd_keys_wt}
++        wandb.tensorboard.patch(root_logdir=f"runs/{time_now}")
++        run = wandb.init(
++                        project="myoHandWheelHoldFixed-v0_left",
++                        entity="wsjhss-mcgill",
++                        group=args.group,
++                        settings=wandb.Settings(start_method="thread"),
++                        config=config,
++                        sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
++                        monitor_gym=True,  # auto-upload the videos of agents playing the game
++                        save_code=True,  # optional
++                        )
++    except ImportError as e:
++        pass 
++
++
++
++    env_name = 'myoHandWheelHoldFixed-v0_left'
++    time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
++    log_path = f'./MPL_baselines_left/policy_best_model/{env_name}/{time_now}/'
++
++
++    envs = SubprocVecEnv([make_env(env_name, i) for i in range(num_cpu)])
++
++    eval_callback = EvalCallback(envs, best_model_save_path=log_path, log_path=log_path,
++                                 eval_freq=10000, deterministic=True, render=False)
++
++    policy_kwargs = {
++        'activation_fn': torch.nn.ReLU,
++        'net_arch': {'pi': [256, 256], 'vf': [256, 256]}
++    }
++
++
++    print("Begin training")
++
++    model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
++           policy_kwargs=policy_kwargs,
++           tensorboard_log=f"runs/{time_now}")
++    
++    # TODO TRY LOADING
++    # model_num =  '2025_07_29_14_36_29'
++    # model = PPO.load('./MPL_baselines_left/policy_best_model_left'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
++
++    obs_callback = TensorboardCallback()
++    callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
++
++    #TODO TOTAL TIMESTEPS HERE
++    model.learn(total_timesteps=100, tb_log_name=env_name + "_" + time_now, callback=callback)
++    model.save(curr_dir+'/WheelDist_policy')
++
++    # evaluate policy
++    all_rewards = []
++    ep_rewards = []
++    done = False
++    obs = envs.reset()
++    done = False
++    for _ in range(100):
++        # get the next action from the policy
++        action, _ = model.predict(obs, deterministic=True)
++        # take an action based on the current observation
++        obs, reward, done, info = envs.step(action)
++        ep_rewards.append(reward)
++    all_rewards.append(np.sum(ep_rewards))
++    print("All episode rewards:", all_rewards)
++    print(f"Average reward: {np.mean(all_rewards)} over 5 episodes")
++    all_rewards
++
++    # # Record video after training
++    record_video(env_name, log_path)
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
+ import myosuite
+ from myosuite.utils import gym
+ import numpy as np
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy_left.zip b/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy_left.zip
+index b3aabd3..3be06fa 100644
+Binary files a/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy_left.zip and b/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy_left.zip differ
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/render.py b/myosuite/envs/myo/myowheelchair/myowheelchairleft/render.py
+index 8761dc0..cdfa5f0 100644
+--- a/myosuite/envs/myo/myowheelchair/myowheelchairleft/render.py
++++ b/myosuite/envs/myo/myowheelchair/myowheelchairleft/render.py
+@@ -15,7 +15,7 @@ if __name__ == "__main__":
+ 
+ 
+     model = PPO("MlpPolicy", env, verbose=0)
+-    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_15_32_32/best_model.zip")
++    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_16_32_04/best_model.zip")
+ 
+     # render
+     frames = []
+@@ -29,7 +29,7 @@ if __name__ == "__main__":
+ 
+     # make a local copy
+     skvideo.io.vwrite(
+-        curr_dir+"/videos/HandFocusedRender_both.mp4",
++        curr_dir+"/videos/HandFocusedRender_4.mp4",
+         np.asarray(frames),
+         outputdict={"-pix_fmt": "yuv420p", "-r": "10"},
+     )
+\ No newline at end of file
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/HandFocusedRender_both.mp4 b/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/HandFocusedRender_both.mp4
+index acc9fcc..cca628b 100644
+Binary files a/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/HandFocusedRender_both.mp4 and b/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/HandFocusedRender_both.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/Wheel_MinDist_left.mp4 b/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/Wheel_MinDist_left.mp4
+index 93fd7a8..5133419 100644
+Binary files a/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/Wheel_MinDist_left.mp4 and b/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/Wheel_MinDist_left.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py b/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
+index 5e50127..86b4e09 100644
+--- a/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
++++ b/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
+@@ -13,7 +13,7 @@ from myosuite.envs.myo.base_v0 import BaseV0
+ 
+ class WheelHoldFixedEnvV0Left(BaseV0):
+ 
+-    DEFAULT_OBS_KEYS = ['time', 'wheel_angle', 'hand_qpos', 'hand_qvel']
++    DEFAULT_OBS_KEYS = ['time', 'wheel_angle', 'hand_qpos', 'hand_qvel', 'wheel_angle_l', 'hand_qpos_l', 'hand_qvel_l']
+     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+         "return_rwd": 30.0,
+         "hand_err_rwd": 10.0,
+@@ -25,17 +25,6 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+ 
+         "bonus": 1.0, 
+         "penalty": 1.0,
+-
+-        "return_rwd_l": 30.0,
+-        "hand_err_rwd_l": 10.0,
+-
+-        "dist_reward_l": 5.0,
+-        "palm_touch_rwd_l": 5.0,
+-        "wheel_rotation_l": 25.0,
+-        "fin_open_l": -2.0,
+-
+-        "bonus_l": 1.0, 
+-        "penalty_l": 1.0,
+     }
+ 
+     def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
+@@ -125,12 +114,11 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+ 
+     def get_obs_vec(self):
+         self.obs_dict['time'] = np.array([self.sim.data.time])
+-        self.obs_dict['hand_qpos'] = self.sim.data.qpos[13:].copy()
+-        self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:].copy()*self.dt
++        self.obs_dict['hand_qpos'] = self.sim.data.qpos[13:49].copy()
++        self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:48].copy()*self.dt
+ 
+-        self.obs_dict['time'] = np.array([self.sim.data.time])
+-        self.obs_dict['hand_qpos_l'] = self.sim.data.qpos[13:].copy()
+-        self.obs_dict['hand_qvel_l'] = self.sim.data.qvel[12:].copy()*self.dt
++        self.obs_dict['hand_qpos_l'] = self.sim.data.qpos[50:].copy()
++        self.obs_dict['hand_qvel_l'] = self.sim.data.qvel[49:].copy()*self.dt
+ 
+         # self.obs_dict['wheel_err_right'] = self.sim.data.site_xpos[self.goal_sid_right] - self.sim.data.site_xpos[self.palm_r]
+         # self.obs_dict['hand_initpos_err_right'] = self.sim.data.site_xpos[self.hand_start_right]- self.sim.data.site_xpos[self.goal_sid_right]
+@@ -176,11 +164,11 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+     def get_obs_dict(self, sim):
+         obs_dict = {}
+         obs_dict['time'] = np.array([sim.data.time])
+-        obs_dict['hand_qpos'] = sim.data.qpos[13:].copy()
+-        obs_dict['hand_qvel'] = sim.data.qvel[12:].copy()*self.dt
++        obs_dict['hand_qpos'] = sim.data.qpos[13:49].copy()
++        obs_dict['hand_qvel'] = sim.data.qvel[12:48].copy()*self.dt
+ 
+-        obs_dict['hand_qpos_l'] = sim.data.qpos[13:].copy()
+-        obs_dict['hand_qvel_l'] = sim.data.qvel[12:].copy()*self.dt
++        obs_dict['hand_qpos_l'] = sim.data.qpos[50:].copy()
++        obs_dict['hand_qvel_l'] = sim.data.qvel[49:].copy()*self.dt
+ 
+         # obs_dict['wheel_err_right'] = sim.data.site_xpos[self.goal_sid_right] - sim.data.site_xpos[self.palm_r]
+         # obs_dict['hand_initpos_err_right'] = sim.data.site_xpos[self.hand_start_right]- sim.data.site_xpos[self.goal_sid_right]
+@@ -306,25 +294,17 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+         if self.task_phase == "push":
+             rwd_dict = collections.OrderedDict((
+                 ('return_rwd', 0),
+-                ('hand_err_rwd', math.exp(-20.0 * abs(hand_err))),
+-                ('dist_reward', dist_reward),
+-                ('palm_touch_rwd', palm_touch_rwd),
+-                ('wheel_rotation', 15.0 * wheel_rotation),
++                ('hand_err_rwd', math.exp(-5.0 * abs(hand_err)) + math.exp(-5.0 * abs(hand_err_l))),
++                ('dist_reward', dist_reward + dist_reward_l),
++                ('palm_touch_rwd', palm_touch_rwd + palm_touch_rwd_l),
++                ('wheel_rotation', 15.0 * wheel_rotation + 15.0 * wheel_rotation_l),
+                 ('act_reg', -0.5 * act_mag),
+-                ('fin_open', np.exp(-5.0 * fin_open)),
+-                ('bonus', 1.0 * (wheel_angle_now < self.init_wheel_angle)),
+-                ('penalty', -1.0 * (wheel_angle_now > self.init_wheel_angle)),
++                ('fin_open', np.exp(-5.0 * fin_open) + np.exp(-5.0 * fin_open_l)),
++                ('bonus', 1.0 * (wheel_angle_now < self.init_wheel_angle) + 1.0 * (wheel_angle_now_l < self.init_wheel_angle_l)),
++                ('penalty', -1.0 * (wheel_angle_now > self.init_wheel_angle) + -1.0 * (wheel_angle_now_l > self.init_wheel_angle_l)),
+                 ('sparse', 0),
+                 ('solved', 0),
+                 ('done', 0),
+-                ('return_rwd_l', 0),
+-                ('hand_err_rwd_l', math.exp(-20.0 * abs(hand_err_l))),
+-                ('dist_reward_l', dist_reward_l),
+-                ('palm_touch_rwd_l', palm_touch_rwd_l),
+-                ('wheel_rotation_l', 15.0 * wheel_rotation_l),
+-                ('fin_open_l', np.exp(-5.0 * fin_open_l)),
+-                ('bonus_l', 1.0 * (wheel_angle_now_l < self.init_wheel_angle_l)),
+-                ('penalty_l', -1.0 * (wheel_angle_now_l > self.init_wheel_angle_l)),
+                 # ('solved', wheel_rotation < -500.0),
+                 # ('done', wheel_rotation > 500.0),
+             ))
+@@ -334,26 +314,18 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+ 
+         elif self.task_phase == "return":
+             rwd_dict = collections.OrderedDict((
+-                ('return_rwd', math.exp(-20.0 * abs(return_err))),
++                ('return_rwd', math.exp(-5.0 * abs(return_err)) + math.exp(-5.0 * abs(return_err_l))),
+                 ('hand_err_rwd', 0),
+-                ('dist_reward', 0.5*dist_reward),
++                ('dist_reward', 0.5*dist_reward + 0.5*dist_reward_l),
+                 ('palm_touch_rwd', 0),
+                 ('wheel_rotation', 0),
+                 ('act_reg', -0.25 * act_mag),
+-                ('fin_open', np.exp(fin_open)),
++                ('fin_open', np.exp(fin_open) + np.exp(fin_open_l)),
+                 ('bonus', 0),
+                 ('penalty', 0),
+-                ('sparse', return_err < 0.025),
++                ('sparse', return_err < 0.025 + return_err_l < 0.025),
+                 ('solved', 0),
+                 ('done', 0),
+-                ('return_rwd_l', math.exp(-20.0 * abs(return_err_l))),
+-                ('hand_err_rwd_l', 0),
+-                ('dist_reward_l', 0.5*dist_reward_l),
+-                ('palm_touch_rwd_l', 0),
+-                ('wheel_rotation_l', 0),
+-                ('fin_open_l', np.exp(fin_open_l)),
+-                ('bonus_l', 0),
+-                ('penalty_l', 0),
+                 # ('solved', return_err < 0.0025),
+                 # ('done', return_err > 50.0),
+             ))
+diff --git a/myosuite/envs/myo/myowheelchair/render.py b/myosuite/envs/myo/myowheelchair/render.py
+index 7d0eb72..cfa2459 100644
+--- a/myosuite/envs/myo/myowheelchair/render.py
++++ b/myosuite/envs/myo/myowheelchair/render.py
+@@ -11,7 +11,7 @@ if __name__ == "__main__":
+     env.reset()
+ 
+     model = PPO("MlpPolicy", env, verbose=0)
+-    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_07_29_14_36_29\best_model.zip")
++    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_29_23_47_52/best_model.zip")
+ 
+     # render
+     frames = []
+diff --git a/wandb/latest-run b/wandb/latest-run
+index 7a4fb5a..9f0fde2 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20250729_155047-lewiqbzd
+\ No newline at end of file
++run-20250730_110235-ba1sglda
+\ No newline at end of file
+diff --git a/wandb/run-20250729_125841-kps6lbcm/files/code/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB_left.py b/wandb/run-20250729_125841-kps6lbcm/files/code/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB_left.py
+index 87ac0e3..55ddaed 100644
+--- a/wandb/run-20250729_125841-kps6lbcm/files/code/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB_left.py
++++ b/wandb/run-20250729_125841-kps6lbcm/files/code/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB_left.py
+@@ -92,7 +92,7 @@ if __name__ == "__main__":
+     import multiprocessing
+     multiprocessing.set_start_method("spawn", force=True)
+ 
+-    num_cpu = 9
++    num_cpu = 12
+ 
+     dof_env = ['myoHandWheelHoldFixed-v0_left']
+ 
+@@ -175,7 +175,7 @@ if __name__ == "__main__":
+     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
+ 
+     #TODO TOTAL TIMESTEPS HERE
+-    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
++    model.learn(total_timesteps=100, tb_log_name=env_name + "_" + time_now, callback=callback)
+     model.save(curr_dir+'/WheelDist_policy_left')
+ 
+     # Record video after training
+diff --git a/wandb/run-20250729_155047-lewiqbzd/run-lewiqbzd.wandb b/wandb/run-20250729_155047-lewiqbzd/run-lewiqbzd.wandb
+index e69de29..0e0f9c9 100644
+Binary files a/wandb/run-20250729_155047-lewiqbzd/run-lewiqbzd.wandb and b/wandb/run-20250729_155047-lewiqbzd/run-lewiqbzd.wandb differ
