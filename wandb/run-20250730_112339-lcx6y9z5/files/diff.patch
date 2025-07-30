@@ -1,0 +1,22 @@
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py b/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py
+index c4d3968..5327bb6 100644
+--- a/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py
++++ b/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py
+@@ -189,7 +189,7 @@ if __name__ == "__main__":
+     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
+ 
+     #TODO TOTAL TIMESTEPS HERE
+-    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
++    model.learn(total_timesteps=5e3, tb_log_name=env_name + "_" + time_now, callback=callback)
+     model.save(curr_dir+'/WheelDist_policy')
+ 
+     # evaluate policy
+diff --git a/wandb/latest-run b/wandb/latest-run
+index 2d548e9..74833c3 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20250730_111121-wxks18kd
+\ No newline at end of file
++run-20250730_112339-lcx6y9z5
+\ No newline at end of file
