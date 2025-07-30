@@ -257,14 +257,9 @@ class WheelHoldFixedEnvV0(BaseV0):
         if self.task_phase == "push":
             # print(f"[Push Phase] hand_err: {hand_err:.4f}, elbow: {elbow_now:.4f}, wheel: {wheel_rotation:.4f}")
 
-<<<<<<< Updated upstream:myosuite/envs/myo/myowheelchair/wheelhold_v0_CURR_PUSH.py
-            triggered_return =  hand_err < 0.05 and wheel_rotation < -0.0012
-            bonus_reward = 200.0 if (triggered_return and not self.triggered_return_bonus) else 0.0
-=======
             #triggered_return =  hand_err < 0.05 and wheel_rotation < -0.0012
-            triggered_return = (abs(wheel_rotation) >= np.deg2rad(0.01))
+            triggered_return = hand_err < 0.05 and wheel_rotation < -0.0012
             bonus_reward = 300.0 if (triggered_return and not self.triggered_return_bonus) else 0.0
->>>>>>> Stashed changes:myosuite/envs/myo/myowheelchair/wheelhold_v0.py
 
             rwd_dict = collections.OrderedDict((
                 ('return_rwd', 0),
@@ -302,24 +297,27 @@ class WheelHoldFixedEnvV0(BaseV0):
             triggered_push = return_err < 0.05
             bonus_reward = 400.0 if triggered_push and not self.triggered_push_bonus else 0.0
 
+            drop = return_err>10.0
+
             rwd_dict = collections.OrderedDict((
-                ('return_rwd', 5.0*math.exp(-50.0 * abs(return_err))),
+                ('return_rwd', 3.0 * np.exp(-2.0 * return_err)),
                 ('hand_err_rwd', 0),
                 ('dist_reward', 0),
-                ('palm_touch_rwd', 0),
+                ('palm_touch_rwd', 0.5*palm_touch_rwd),
                 ('wheel_rotation', 0),
-                ('act_reg', -0.25 * act_mag),
+                ('act_reg', -1. * act_mag),
                 ('fin_open', 0),
-                ('bonus', 1.* (return_err < 0.2)+ bonus_reward),
-                ('penalty', -return_err),
-                ('sparse', return_err < 0.1),
-                ('solved', 0),
-                ('done', 0),
-                # ('solved', return_err < 0.0025),
-                # ('done', return_err > 50.0),
+                ('bonus', 1.*(return_err<2*0.1) + 1.*(return_err<0.1)),
+                ('penalty', -1.*(drop)),
+                ('sparse', -10.0*return_err),
+                # ('solved', 0),
+                # ('done', 0),
+                ('solved', (return_err < 0.0025) and (not drop)),
+                ('done', drop),
             ))
             #if return_err < 0.05 and elbow_now < -1.0:
-            if elbow_now < -.4:
+            # if elbow_now < -.4:
+            if return_err <0.05:
                 print("return successful, pushing again")
                 self.task_phase = "push"
                 self.triggered_push_bonus = True  # prevent repeat bonus
