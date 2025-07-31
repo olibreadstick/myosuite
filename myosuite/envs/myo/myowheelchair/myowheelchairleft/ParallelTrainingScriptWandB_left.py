@@ -177,19 +177,20 @@ if __name__ == "__main__":
 
     print("Begin training")
 
-    model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
-           policy_kwargs=policy_kwargs,
-           tensorboard_log=f"runs/{time_now}")
+    #model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
+            #policy_kwargs=policy_kwargs,
+            #tensorboard_log=f"runs/{time_now}")
     
     # TODO TRY LOADING
-    # model_num =  '2025_07_29_23_47_52'
-    # model = PPO.load('./MPL_baselines_left/policy_best_model_left'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
+    model_num =  '2025_07_30_15_16_39'
+    #model_num = '2025_07_29_16_32_04'
+    model = PPO.load('./MPL_baselines_left/policy_best_model_left'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
 
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
 
     #TODO TOTAL TIMESTEPS HERE
-    model.learn(total_timesteps=1e5, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
     model.save(curr_dir+'/WheelDist_policy')
 
     # evaluate policy

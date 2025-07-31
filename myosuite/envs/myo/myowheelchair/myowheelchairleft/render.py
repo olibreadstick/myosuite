@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
 
     model = PPO("MlpPolicy", env, verbose=0)
-    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines_left\policy_best_model_left\myoHandWheelHoldFixed-v0_left\2025_07_30_13_10_41\best_model.zip")
+    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_07_31_15_00_48/best_model.zip")
 
     # render
     frames = []
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     # make a local copy
     skvideo.io.vwrite(
-        curr_dir+"/videos/HandFocusedRender_4.mp4",
+        curr_dir+"/videos/HandFocusedRender_both_2.mp4",
         np.asarray(frames),
         outputdict={"-pix_fmt": "yuv420p", "-r": "10"},
     )
