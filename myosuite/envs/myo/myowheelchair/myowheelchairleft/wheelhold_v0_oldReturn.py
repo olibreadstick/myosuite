@@ -1,0 +1,194 @@
+""" =================================================
+# Copyright (c) Facebook, Inc. and its affiliates
+Authors  :: Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano (caggiano@gmail.com)
+================================================= """
+
+import collections
+import numpy as np
+import math
+from myosuite.utils import gym
+
+from myosuite.envs.myo.base_v0 import BaseV0
+
+
+class WheelHoldFixedEnvV0Left(BaseV0):
+
+    DEFAULT_OBS_KEYS = ['time', 'wheel_angle', 'hand_qpos', 'hand_qvel', 'wheel_angle_l', 'hand_qpos_l', 'hand_qvel_l']
+    DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+        "return_rwd": 10.0,
+        "hand_err_rwd": 0.0,
+
+        "dist_reward": 1.0,
+        "palm_touch_rwd": 1.0,
+        "wheel_rotation": 1.0,
+        "fin_open": -2.0,
+
+        "bonus": 1.0, 
+        "penalty": 1.0,
+    }
+
+    def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
+
+        # EzPickle.__init__(**locals()) is capturing the input dictionary of the init method of this class.
+        # In order to successfully capture all arguments we need to call gym.utils.EzPickle.__init__(**locals())
+        # at the leaf level, when we do inheritance like we do here.
+        # kwargs is needed at the top level to account for injection of __class__ keyword.
+        # Also see: https://github.com/openai/gym/pull/1497
+        gym.utils.EzPickle.__init__(self, model_path, obsd_model_path, seed, **kwargs)
+
+        # This two step construction is required for pickling to work correctly. All arguments to all __init__
+        # calls must be pickle friendly. Things like sim / sim_obsd are NOT pickle friendly. Therefore we
+        # first construct the inheritance chain, which is just __init__ calls all the way down, with env_base
+        # creating the sim / sim_obsd instances. Next we run through "setup"  which relies on sim / sim_obsd
+        # created in __init__ to complete the setup.
+        super().__init__(model_path=model_path, obsd_model_path=obsd_model_path, seed=seed, env_credits=self.MYO_CREDIT)
+
+        self._setup(**kwargs)
+
+
+    def _setup(self,
+            obs_keys:list = DEFAULT_OBS_KEYS,
+            weighted_reward_keys:list = DEFAULT_RWD_KEYS_AND_WEIGHTS,
+            **kwargs,
+        ):
+        self.palm_l = self.sim.model.site_name2id("palm_l")
+        self.hand_start_left = self.sim.model.site_name2id("hand_start_left") #red, static
+        # hand target position, start returning when reached
+        self.hand_TARGET_left = self.sim.model.site_name2id("hand_TARGET_left") #blue, STATIC
+
+        self.palm_r = self.sim.model.site_name2id("palm_r")
+        self.hand_start_right = self.sim.model.site_name2id("hand_start_right") #red, static        
+        # hand target position, start returning when reached
+        self.hand_TARGET_right = self.sim.model.site_name2id("hand_TARGET_right") #blue, STATIC
+
+        # define the palm and tip site id.
+        # self.palm_r = self.sim.model.site_name2id('S_grasp')
+        self.init_palm_z_l = self.sim.data.site_xpos[self.palm_l][-1]
+        self.init_palm_z = self.sim.data.site_xpos[self.palm_r][-1]
+
+        self.wheel_joint_id_l = self.sim.model.joint_name2id("left_rear") #right wheel joint
+        self.init_wheel_angle_l = self.sim.data.qpos[self.wheel_joint_id_l].copy() #INIITAL wheel angle
+
+        self.wheel_joint_id = self.sim.model.joint_name2id("right_rear") #right wheel joint
+        self.init_wheel_angle = self.sim.data.qpos[self.wheel_joint_id].copy() #INIITAL wheel angle
+
+        #elbow jnt
+        self.elbow_joint_id = self.sim.model.joint_name2id("elbow_flexion")
+        self.elbow_joint_id_l = self.sim.model.joint_name2id("elbow_flexionL")
+
+        super()._setup(obs_keys=obs_keys,
+                    weighted_reward_keys=weighted_reward_keys,
+                    **kwargs,
+        )
+        
+        self.init_qpos = self.sim.model.key_qpos[1].copy() # copy returning keyframe
+
+
+    def get_obs_vec(self):
+        self.obs_dict['time'] = np.array([self.sim.data.time])
+        self.obs_dict['hand_qpos'] = self.sim.data.qpos[13:49].copy()
+        self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:48].copy()*self.dt
+
+        self.obs_dict['hand_qpos_l'] = self.sim.data.qpos[50:].copy()
+        self.obs_dict['hand_qvel_l'] = self.sim.data.qvel[49:].copy()*self.dt
+
+        self.obs_dict["palm_pos_l"] = self.sim.data.site_xpos[self.palm_l]
+        self.obs_dict["palm_pos_r"] = self.sim.data.site_xpos[self.palm_r]
+
+        self.obs_dict['wheel_angle'] = np.array([self.sim.data.qpos[self.wheel_joint_id]])
+        self.obs_dict['wheel_angle_l'] = np.array([self.sim.data.qpos[self.wheel_joint_id_l]])
+
+        #calculate palm to return position
+        self.obs_dict['return_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_start_right]
+        self.obs_dict['return_err_l'] = self.sim.data.site_xpos[self.palm_l]- self.sim.data.site_xpos[self.hand_start_left]
+
+        if self.sim.model.na>0:
+            self.obs_dict['act'] = self.sim.data.act[:].copy()
+
+        t, obs = self.obsdict2obsvec(self.obs_dict, self.obs_keys)
+        return obs
+
+    def get_obs_dict(self, sim):
+        obs_dict = {}
+        obs_dict['time'] = np.array([sim.data.time])
+        obs_dict['hand_qpos'] = sim.data.qpos[13:49].copy()
+        obs_dict['hand_qvel'] = sim.data.qvel[12:48].copy()*self.dt
+
+        obs_dict['hand_qpos_l'] = sim.data.qpos[50:].copy()
+        obs_dict['hand_qvel_l'] = sim.data.qvel[49:].copy()*self.dt
+
+        obs_dict["palm_pos_l"] = sim.data.site_xpos[self.palm_l]
+        obs_dict["palm_pos_r"] = sim.data.site_xpos[self.palm_r]
+
+        obs_dict['wheel_angle'] = np.array([sim.data.qpos[self.wheel_joint_id]])
+        obs_dict['wheel_angle_l'] = np.array([sim.data.qpos[self.wheel_joint_id_l]])
+
+        #calculate palm to return position
+        obs_dict['return_err'] = self.sim.data.site_xpos[self.palm_r]- self.sim.data.site_xpos[self.hand_start_right]
+        obs_dict['return_err_l'] = self.sim.data.site_xpos[self.palm_l]- self.sim.data.site_xpos[self.hand_start_left]
+
+        if sim.model.na>0:
+            obs_dict['act'] = sim.data.act[:].copy()
+        
+        return obs_dict
+
+    def get_reward_dict(self, obs_dict):
+        # CHECK IF PALM TOUCHING WHEEL
+        palm_body_id = self.sim.model.body_name2id("thirdmc")
+        rail_body_id = self.sim.model.body_name2id("right_handrail")
+
+        palm_body_id_l = self.sim.model.body_name2id("thirdmcL")
+        rail_body_id_l = self.sim.model.body_name2id("left_handrail")
+
+        ### DENSE reward for palm close to rail ###
+        rail_center_pos = self.sim.data.body_xpos[rail_body_id]
+        rail_center_pos_l = self.sim.data.body_xpos[rail_body_id_l]
+        # Distance from palm to the rail *surface*
+        palm_to_rail_surface_dist = max(0.0, np.linalg.norm(obs_dict["palm_pos_r"] - rail_center_pos) - 0.277)
+        palm_to_rail_surface_dist_l = max(0.0, np.linalg.norm(obs_dict["palm_pos_l"] - rail_center_pos) - 0.277)
+        
+        # Reward: higher when palm is closer to the surface
+        dist_reward = np.exp(-10.0 * palm_to_rail_surface_dist)
+        dist_reward_l = np.exp(-10.0 * palm_to_rail_surface_dist)
+
+        # calculate wheel rotation, just want it as big and negative as possible
+        wheel_angle_now = self.sim.data.qpos[self.wheel_joint_id]
+        wheel_rotation = -1*(wheel_angle_now - self.init_wheel_angle) #rotate cw? I think?
+
+        wheel_angle_now_l = self.sim.data.qpos[self.wheel_joint_id_l]
+        wheel_rotation_l = -1*(wheel_angle_now - self.init_wheel_angle_l) #rotate cw? I think
+
+        # minimize muscle activation for realism
+        act_mag = np.linalg.norm(self.obs_dict['act'], axis=-1)/self.sim.model.na if self.sim.model.na !=0 else 0
+
+        #errs
+        return_err = np.linalg.norm(obs_dict["return_err"])
+        return_err_l = np.linalg.norm(obs_dict["return_err_l"])
+
+        drop = (return_err > 1.5) or (return_err_l > 1.5)
+        gaol_th = 0.05
+
+        rwd_dict = collections.OrderedDict((
+            ('return_rwd', math.exp(-5.0 * abs(return_err)) + math.exp(-5.0 * abs(return_err_l))),
+            ('dist_reward', 0.1*dist_reward + 0.1*dist_reward_l),
+            ('wheel_rotation', -wheel_rotation**2 - wheel_rotation_l**2),
+            ('act_reg', -0.5 * act_mag),
+            ('bonus', 1.*(return_err<2*gaol_th) + 1.*(return_err<gaol_th) + 1.*(return_err_l<2*gaol_th) + 1.*(return_err_l<gaol_th)),
+            ('penalty', -1.*drop),
+            ('sparse', -return_err - return_err_l),
+            ('solved', (return_err < gaol_th) or (return_err_l < gaol_th)),
+            ('done', drop),
+            ('hand_err_rwd', 0),
+            ('palm_touch_rwd', 0),
+            ('fin_open', 0),
+        ))
+
+        rwd_dict['dense'] = np.sum([wt * rwd_dict[key] for key, wt in self.rwd_keys_wt.items()])
+        # self.prev_rwd_dict = rwd_dict  # Always update
+        return rwd_dict
+    
+    def reset(self, **kwargs):
+        self.robot.sync_sims(self.sim, self.sim_obsd)
+        obs = super().reset(**kwargs)
+
+        return obs

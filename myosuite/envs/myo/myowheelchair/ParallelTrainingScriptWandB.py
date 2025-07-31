@@ -175,13 +175,13 @@ if __name__ == "__main__":
 
     print("Begin training")
 
-    # model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
-    #        policy_kwargs=policy_kwargs,
-    #        tensorboard_log=f"runs/{time_now}")
+    model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
+           policy_kwargs=policy_kwargs,
+           tensorboard_log=f"runs/{time_now}")
     
     # TODO TRY LOADING
-    model_num =  '2025_07_24_15_22_37_Good'
-    model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
+    # model_num =  '2025_07_24_15_22_37_Good'
+    # model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
 
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
