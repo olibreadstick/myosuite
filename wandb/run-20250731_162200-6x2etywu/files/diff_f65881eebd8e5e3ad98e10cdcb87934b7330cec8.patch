@@ -1,0 +1,24 @@
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py b/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py
+index 008847e..b8dca25 100644
+--- a/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py
++++ b/myosuite/envs/myo/myowheelchair/myowheelchairleft/ParallelTrainingScriptWandB_left.py
+@@ -182,8 +182,8 @@ if __name__ == "__main__":
+             #tensorboard_log=f"runs/{time_now}")
+     
+     # TODO TRY LOADING
+-    model_num =  '2025_07_30_15_16_39'
+-    #model_num = '2025_07_29_16_32_04'
++    #model_num =  '2025_07_30_15_16_39'
++    model_num = '2025_07_29_16_32_04'
+     model = PPO.load('./MPL_baselines_left/policy_best_model_left'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
+ 
+     obs_callback = TensorboardCallback()
+diff --git a/wandb/latest-run b/wandb/latest-run
+index e65e576..99211b3 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20250731_155224-ci08twuj
+\ No newline at end of file
++run-20250731_162200-6x2etywu
+\ No newline at end of file
