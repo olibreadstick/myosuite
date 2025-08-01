@@ -10,6 +10,9 @@ import numpy as np
 import math
 from myosuite.utils import gym
 import mujoco
+import pandas as pd
+import os
+
 
 from myosuite.envs.myo.base_v0 import BaseV0
 
@@ -51,7 +54,14 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.palm_r = self.sim.model.site_name2id("palm_r")
         self.target_qpos = self.sim.model.key_qpos[0].copy() # hand closing in on rail
 
-        self.return_traj = self.create_return_trajectory(steps=100)
+        curr_dir = os.path.dirname(os.path.abspath(__file__))
+        self.return_traj = pd.read_csv(curr_dir + '/myowheelchairleft/Return_Phase_Trajectory.csv').values[:, 13:] 
+        print("[DEBUG] self.sim.data.qpos.shape:", self.sim.data.qpos.shape)
+        print("[DEBUG] hand_qpos slice shape:", self.sim.data.qpos[13:].shape)
+        print("[DEBUG] self.return_traj.shape:", self.return_traj.shape)
+        print("[DEBUG] self.return_traj[0].shape:", self.return_traj[0].shape)
+
+
         self.return_start_time = self.sim.data.time
         self.return_duration = 1.5  # seconds
 
@@ -92,6 +102,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         target_qpos = self.return_traj[step]
         current_qpos = self.sim.data.qpos[13:]
 
+
+
         traj_err = np.linalg.norm(current_qpos - target_qpos) / len(current_qpos)
         
         rwd_dict = collections.OrderedDict((
@@ -112,7 +124,8 @@ class WheelHoldFixedEnvV0(BaseV0):
         return rwd_dict
     
     def reset(self, **kwargs):
-        self.return_traj = self.create_return_trajectory(steps=50)
+        curr_dir = os.path.dirname(os.path.abspath(__file__))
+        self.return_traj = pd.read_csv(curr_dir + '/myowheelchairleft/Return_Phase_Trajectory.csv').values[:, 13:]
         self.return_start_time = self.sim.data.time
         self.return_duration = 1.0  # seconds
 
@@ -122,47 +135,4 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.sim.data.qpos[:] = self.sim.model.key_qpos[1]
         self.sim.data.qvel[:] = 0
 
-        self.compute_inverse_dynamics_torques("return_torques.csv")  # Add this line if desired
-
         return obs
-
-    def create_return_trajectory(self, steps=100):
-        start = self.sim.model.key_qpos[1][13:].copy()
-        goal = self.sim.model.key_qpos[0][13:].copy()
-        return [((1 - t) * start + t * goal) for t in np.linspace(0, 1, steps)]
-
-
-    def compute_inverse_dynamics_torques(self, save_path="return_torques.csv"):
-        """Compute inverse dynamics torques for the return trajectory."""
-        torques = []
-        traj = self.return_traj
-        n_steps = len(traj)
-
-        m = self.sim.model.ptr  # raw mujoco.MjModel pointer
-        d = self.sim.data.ptr   # raw mujoco.MjData pointer
-
-        for i in range(n_steps - 1):
-            qpos = traj[i]
-            qvel = traj[i + 1] - traj[i]
-            qacc = traj[i + 2] - 2 * traj[i + 1] + traj[i] if i + 2 < n_steps else np.zeros_like(qvel)
-
-            full_qpos = self.sim.data.qpos.copy()
-            full_qvel = self.sim.data.qvel.copy()
-            full_qpos[13:] = qpos
-            full_qvel[12:] = qvel / self.dt
-            qacc_full = np.zeros_like(full_qvel)
-            qacc_full[12:] = qacc / (self.dt ** 2)
-
-            self.sim.data.qpos[:] = full_qpos
-            self.sim.data.qvel[:] = full_qvel
-            self.sim.data.qacc[:] = qacc_full
-
-            mujoco.mj_forward(m, d)
-            mujoco.mj_inverse(m, d)
-
-            tau = self.sim.data.qfrc_inverse.copy()
-            torques.append(tau[12:])
-
-        torques = np.array(torques)
-        np.savetxt(save_path, torques, delimiter=",")
-        print(f"[INFO] Saved inverse dynamics torques to: {save_path}")
