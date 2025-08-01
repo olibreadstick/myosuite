@@ -15,11 +15,12 @@ from myosuite.envs.myo.base_v0 import BaseV0
 
 class WheelHoldFixedEnvV0(BaseV0):
 
-    DEFAULT_OBS_KEYS = ['time', 'hand_qpos', 'hand_qvel']
+    DEFAULT_OBS_KEYS = ['time', 'hand_qpos', 'hand_qvel', 'traj_err', 'target_qpos']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
         "trajectory_rwd": 5.0,
         "bonus": 2.0,
         "penalty": 5.0,
+        "sparse": 5.0,
     }
 
     def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
@@ -52,7 +53,7 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         self.return_traj = self.create_return_trajectory(steps=100)
         self.return_start_time = self.sim.data.time
-        self.return_duration = 1.5  # seconds
+        self.return_duration = 15.0  # seconds
 
         super()._setup(obs_keys=obs_keys,
                     weighted_reward_keys=weighted_reward_keys,
@@ -66,6 +67,9 @@ class WheelHoldFixedEnvV0(BaseV0):
         self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:].copy()*self.dt
 
         self.obs_dict["palm_pos"] = self.sim.data.site_xpos[self.palm_r]
+        self.obs_dict["traj_err"] = np.array([getattr(self, "traj_err", 0.0)])
+
+        self.obs_dict['target_qpos'] = self.target_qpos.copy()
 
         if self.sim.model.na>0:
             self.obs_dict['act'] = self.sim.data.act[:].copy()
@@ -79,6 +83,9 @@ class WheelHoldFixedEnvV0(BaseV0):
         obs_dict['hand_qpos'] = sim.data.qpos[13:].copy()
         obs_dict['hand_qvel'] = sim.data.qvel[12:].copy()*self.dt
         obs_dict["palm_pos"] = sim.data.site_xpos[self.palm_r]
+        obs_dict["traj_err"] = np.array([getattr(self, "traj_err", 0.0)])
+
+        obs_dict['target_qpos'] = self.target_qpos.copy()
 
         if sim.model.na>0:
             obs_dict['act'] = sim.data.act[:].copy()
@@ -92,6 +99,7 @@ class WheelHoldFixedEnvV0(BaseV0):
         current_qpos = self.sim.data.qpos[13:]
 
         traj_err = np.linalg.norm(current_qpos - target_qpos) / len(current_qpos)
+        self.traj_err = traj_err
         
         rwd_dict = collections.OrderedDict((
             # Optional shaping reward
@@ -120,6 +128,10 @@ class WheelHoldFixedEnvV0(BaseV0):
 
         self.sim.data.qpos[:] = self.sim.model.key_qpos[1]
         self.sim.data.qvel[:] = 0
+        self.sim.data.act[:] = 0
+
+        # for _ in range(10):
+        #     self.sim.step()
 
         return obs
     
