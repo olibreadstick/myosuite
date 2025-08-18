@@ -22,6 +22,7 @@ class WheelHoldFixedEnvV0Left(BaseV0):
     DEFAULT_OBS_KEYS = ['time', 'hand_qpos', 'hand_qvel']
     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
         "trajectory_rwd": 5.0,
+        "elbow_target_rwd": 3.0,
         "bonus": 2.0,
         "penalty": 5.0,
     }
@@ -51,13 +52,21 @@ class WheelHoldFixedEnvV0Left(BaseV0):
             **kwargs,
         ):
 
+        self.elb_l = self.sim.model.site_name2id("elb_l")
+        self.elb_TARGET_left = self.sim.model.site_name2id("elb_TARGET_left") #blue, STATIC
+
+        self.elb_r = self.sim.model.site_name2id("elb_r")
+        self.elb_TARGET_right = self.sim.model.site_name2id("elb_TARGET_right") #blue, STATIC
+
+
         self.palm_r = self.sim.model.site_name2id("palm_r")
         self.target_qpos = self.sim.model.key_qpos[0].copy() # hand closing in on rail
 
-        curr_dir = os.path.dirname(os.path.abspath(__file__))
-        self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
-        self.return_start_time = self.sim.data.time
-        self.return_duration = 1.5  # seconds
+
+        # curr_dir = os.path.dirname(os.path.abspath(__file__))
+        # self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
+        # self.return_start_time = self.sim.data.time
+        # self.return_duration = 1.0  # seconds
 
         super()._setup(obs_keys=obs_keys,
                     weighted_reward_keys=weighted_reward_keys,
@@ -71,6 +80,13 @@ class WheelHoldFixedEnvV0Left(BaseV0):
         self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:].copy()*self.dt
 
         self.obs_dict["palm_pos"] = self.sim.data.site_xpos[self.palm_r]
+
+        #calculate elb to return position
+        self.obs_dict['elb_return_err'] = self.sim.data.site_xpos[self.elb_r]- self.sim.data.site_xpos[self.elb_TARGET_right]
+        self.obs_dict['elb_return_err_l'] = self.sim.data.site_xpos[self.elb_l]- self.sim.data.site_xpos[self.elb_TARGET_left]
+
+
+
 
         if self.sim.model.na>0:
             self.obs_dict['act'] = self.sim.data.act[:].copy()
@@ -91,25 +107,35 @@ class WheelHoldFixedEnvV0Left(BaseV0):
         return obs_dict
 
     def get_reward_dict(self, obs_dict):
-        step = int((self.sim.data.time - self.return_start_time) / self.return_duration * len(self.return_traj))
-        step = np.clip(step, 0, len(self.return_traj) - 1)
-        target_qpos = self.return_traj[step]
-        current_qpos = self.sim.data.qpos.copy()
+        #_time) / self.return_duration * len(self.return_traj))
+        #step = np.clip(step, 0, len(self.return_traj) - 1)
+        # target_qpos = self.return_traj[step]
+        # #[13:27]
+        # current_qpos = self.sim.data.qpos
+        # #[13:27]
 
 
 
-        traj_err = np.linalg.norm(current_qpos - target_qpos) / len(current_qpos)
+        # traj_err = np.linalg.norm(current_qpos - target_qpos) / len(current_qpos)
         
+        elb_err_r = np.linalg.norm(self.sim.data.site_xpos[self.elb_r] - self.sim.data.site_xpos[self.elb_TARGET_right])
+        elb_err_l = np.linalg.norm(self.sim.data.site_xpos[self.elb_l] - self.sim.data.site_xpos[self.elb_TARGET_left])
+
+        elb_total_err = (elb_err_r + elb_err_l) 
+
+
         rwd_dict = collections.OrderedDict((
             # Optional shaping reward
-            ('trajectory_rwd', -traj_err),
+            #('trajectory_rwd', -traj_err),
+            ('trajectory_rwd', 0),
+            ('elbow_target_rwd', -elb_total_err),
 
             # MUST KEYS
-            ('bonus', 1.0 * (traj_err < 0.2) + 1.0 * (traj_err < 0.1)),
-            ('penalty', -1.0 * (traj_err > 1.5)),  # drop if far off path
-            ('sparse', -10.0 * traj_err),
-            ('solved', float(traj_err < 0.0025)),
-            ('done', bool(traj_err > 1.5)),
+            ('bonus', 1.0 * (elb_total_err < 0.2) + 1.0 * (elb_total_err < 0.1)),
+            ('penalty', -1.0 * (elb_total_err > 1.5)),  # drop if far off path
+            ('sparse', -10.0 * elb_total_err),
+            ('solved', float(elb_total_err < 0.0025)),
+            ('done', bool(elb_total_err > 1.5)),
         ))
 
         
@@ -118,15 +144,15 @@ class WheelHoldFixedEnvV0Left(BaseV0):
         return rwd_dict
     
     def reset(self, **kwargs):
-        curr_dir = os.path.dirname(os.path.abspath(__file__))
-        self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
-        self.return_start_time = self.sim.data.time
-        self.return_duration = 1.0  # seconds
+        # curr_dir = os.path.dirname(os.path.abspath(__file__))
+        # self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
+        # self.return_start_time = self.sim.data.time
+        # self.return_duration = 1.0  # seconds
 
         self.robot.sync_sims(self.sim, self.sim_obsd)
         obs = super().reset(**kwargs)
 
-        self.sim.data.qpos[:] = self.sim.model.key_qpos[1]
-        self.sim.data.qvel[:] = 0
+        # self.sim.data.qpos[:] = self.sim.model.key_qpos[1]
+        # self.sim.data.qvel[:] = 0
 
         return obs
