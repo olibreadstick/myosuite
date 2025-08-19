@@ -1,0 +1,40 @@
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index 6b8af449..90b8c90c 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -133,7 +133,7 @@ if __name__ == "__main__":
+             "env_name": env_name,
+             "dense_units": 512,
+             "activation": "relu",
+-            "max_episode_steps": 200,
++            "max_episode_steps": 500,
+             "seed": args.seed,
+             "entropy": ENTROPY,
+             "lr": args.learning_rate,
+diff --git a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip
+index ff5057c1..30bdf4da 100644
+Binary files a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip and b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip differ
+diff --git a/myosuite/envs/myo/myowheelchair/render.py b/myosuite/envs/myo/myowheelchair/render.py
+index 82f64e4e..34544c1e 100644
+--- a/myosuite/envs/myo/myowheelchair/render.py
++++ b/myosuite/envs/myo/myowheelchair/render.py
+@@ -11,11 +11,11 @@ if __name__ == "__main__":
+     env.reset()
+ 
+     model = PPO("MlpPolicy", env, verbose=0)
+-    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_08_01_14_52_10\best_model.zip")
++    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_08_01_16_48_13\best_model.zip")
+ 
+     # render
+     frames = []
+-    for _ in range(800):
++    for _ in range(500):
+         frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=0)) 
+         o = env.get_obs()
+         a = pi.predict(o)[0]
+diff --git a/myosuite/envs/myo/myowheelchair/videos/Curr_Best.mp4 b/myosuite/envs/myo/myowheelchair/videos/Curr_Best.mp4
+index 876110a2..a6ca870f 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/Curr_Best.mp4 and b/myosuite/envs/myo/myowheelchair/videos/Curr_Best.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender3.mp4 b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender3.mp4
+index 0cb3814f..85661938 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender3.mp4 and b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender3.mp4 differ

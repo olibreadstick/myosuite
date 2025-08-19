@@ -1,0 +1,76 @@
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index 6b8af449..ee573297 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -133,7 +133,7 @@ if __name__ == "__main__":
+             "env_name": env_name,
+             "dense_units": 512,
+             "activation": "relu",
+-            "max_episode_steps": 200,
++            "max_episode_steps": 500,
+             "seed": args.seed,
+             "entropy": ENTROPY,
+             "lr": args.learning_rate,
+@@ -175,19 +175,29 @@ if __name__ == "__main__":
+ 
+     print("Begin training")
+ 
+-    model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
+-           policy_kwargs=policy_kwargs,
+-           tensorboard_log=f"runs/{time_now}")
++    # model = PPO('MlpPolicy', envs, 
++    #             learning_rate=0.0001,
++    #             n_steps=4096,       # ← increase from default 2048
++    #             batch_size=256,     # ← increase from default 64
++    #             verbose=1, ent_coef=0.001, 
++    #             policy_kwargs=policy_kwargs,
++    #             tensorboard_log=f"runs/{time_now}")
+     
+     # TODO TRY LOADING
+-    # model_num =  '2025_07_24_15_22_37_Good'
+-    # model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
++    model_num =  '2025_08_18_17_12_25_GOOD'
++    model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs,
++                learning_rate=0.0001,
++                n_steps=4096,       # ← increase from default 2048
++                batch_size=256,     # ← increase from default 64
++                verbose=1, ent_coef=0.001, 
++                policy_kwargs=policy_kwargs,
++                tensorboard_log=f"runs/{time_now}")
+ 
+     obs_callback = TensorboardCallback()
+     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
+ 
+     #TODO TOTAL TIMESTEPS HERE
+-    model.learn(total_timesteps=5e5, tb_log_name=env_name + "_" + time_now, callback=callback)
++    model.learn(total_timesteps=2e6, tb_log_name=env_name + "_" + time_now, callback=callback)
+     model.save(curr_dir+'/WheelDist_policy')
+ 
+     # evaluate policy
+diff --git a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip
+index ff5057c1..21ea0910 100644
+Binary files a/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip and b/myosuite/envs/myo/myowheelchair/WheelDist_policy.zip differ
+diff --git a/myosuite/envs/myo/myowheelchair/render.py b/myosuite/envs/myo/myowheelchair/render.py
+index 82f64e4e..c6bbebac 100644
+--- a/myosuite/envs/myo/myowheelchair/render.py
++++ b/myosuite/envs/myo/myowheelchair/render.py
+@@ -11,11 +11,11 @@ if __name__ == "__main__":
+     env.reset()
+ 
+     model = PPO("MlpPolicy", env, verbose=0)
+-    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_08_01_14_52_10\best_model.zip")
++    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines\policy_best_model\myoHandWheelHoldFixed-v0\2025_08_18_15_46_34\best_model.zip")
+ 
+     # render
+     frames = []
+-    for _ in range(800):
++    for _ in range(500):
+         frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=0)) 
+         o = env.get_obs()
+         a = pi.predict(o)[0]
+diff --git a/myosuite/envs/myo/myowheelchair/videos/Curr_Best.mp4 b/myosuite/envs/myo/myowheelchair/videos/Curr_Best.mp4
+index 876110a2..ddc1b68e 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/Curr_Best.mp4 and b/myosuite/envs/myo/myowheelchair/videos/Curr_Best.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender3.mp4 b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender3.mp4
+index 0cb3814f..df03603c 100644
+Binary files a/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender3.mp4 and b/myosuite/envs/myo/myowheelchair/videos/HandFocusedRender3.mp4 differ
