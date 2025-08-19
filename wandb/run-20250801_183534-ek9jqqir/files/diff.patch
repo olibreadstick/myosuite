@@ -1,0 +1,267 @@
+diff --git a/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_08_01_16_48_29/evaluations.npz b/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_08_01_16_48_29/evaluations.npz
+index ac84b3d..1d40b71 100644
+Binary files a/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_08_01_16_48_29/evaluations.npz and b/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_08_01_16_48_29/evaluations.npz differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_0.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_0.monitor.csv
+index eebd1e0..f535428 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_0.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_0.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_1.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_1.monitor.csv
+index 16a5d77..9b87a0b 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_1.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_1.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_10.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_10.monitor.csv
+index b70c33d..3783229 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_10.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_10.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_11.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_11.monitor.csv
+index 2dbc9f9..4ae9c8c 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_11.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_11.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_2.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_2.monitor.csv
+index 85ebb29..0c619c1 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_2.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_2.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_3.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_3.monitor.csv
+index 566aaf2..04aba7d 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_3.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_3.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_4.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_4.monitor.csv
+index 1678f94..5085de5 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_4.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_4.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_5.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_5.monitor.csv
+index 9512ada..3f0d73a 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_5.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_5.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_6.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_6.monitor.csv
+index 9cc51db..bfd1519 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_6.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_6.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_7.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_7.monitor.csv
+index 61ad57b..9f0e51d 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_7.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_7.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_8.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_8.monitor.csv
+index 4398ee6..5a39507 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_8.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_8.monitor.csv differ
+diff --git a/logs/myoHandWheelHoldFixed-v0_left_9.monitor.csv b/logs/myoHandWheelHoldFixed-v0_left_9.monitor.csv
+index 38aa33b..d27ddbf 100644
+Binary files a/logs/myoHandWheelHoldFixed-v0_left_9.monitor.csv and b/logs/myoHandWheelHoldFixed-v0_left_9.monitor.csv differ
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy.zip b/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy.zip
+index 37955d6..33bdbc5 100644
+Binary files a/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy.zip and b/myosuite/envs/myo/myowheelchair/myowheelchairleft/WheelDist_policy.zip differ
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/render.py b/myosuite/envs/myo/myowheelchair/myowheelchairleft/render.py
+index ae6b566..19457fe 100644
+--- a/myosuite/envs/myo/myowheelchair/myowheelchairleft/render.py
++++ b/myosuite/envs/myo/myowheelchair/myowheelchairleft/render.py
+@@ -15,7 +15,7 @@ if __name__ == "__main__":
+ 
+ 
+     model = PPO("MlpPolicy", env, verbose=0)
+-    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_08_01_16_23_21/best_model.zip")
++    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_08_01_17_27_10/best_model.zip")
+ 
+     # render
+     frames = []
+@@ -29,7 +29,7 @@ if __name__ == "__main__":
+ 
+     # make a local copy
+     skvideo.io.vwrite(
+-        curr_dir+"/videos/HandFocusedRender_traj_olivia_from_2025_08_01_16_23_21.mp4",
++        curr_dir+"/videos/HandFocusedRender_traj_shld_only_from_2025_08_01_17_27_10.mp4",
+         np.asarray(frames),
+         outputdict={"-pix_fmt": "yuv420p", "-r": "10"},
+     )
+\ No newline at end of file
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/Curr_Best.mp4 b/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/Curr_Best.mp4
+index a9c960a..6269fe5 100644
+Binary files a/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/Curr_Best.mp4 and b/myosuite/envs/myo/myowheelchair/myowheelchairleft/videos/Curr_Best.mp4 differ
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py b/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
+index 3673d1e..69f4904 100644
+--- a/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
++++ b/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
+@@ -22,6 +22,7 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+     DEFAULT_OBS_KEYS = ['time', 'hand_qpos', 'hand_qvel']
+     DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+         "trajectory_rwd": 5.0,
++        "elbow_target_rwd": 3.0,
+         "bonus": 2.0,
+         "penalty": 5.0,
+     }
+@@ -51,13 +52,21 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+             **kwargs,
+         ):
+ 
++        self.elb_l = self.sim.model.site_name2id("elb_l")
++        self.elb_TARGET_left = self.sim.model.site_name2id("elb_TARGET_left") #blue, STATIC
++
++        self.elb_r = self.sim.model.site_name2id("elb_r")
++        self.elb_TARGET_right = self.sim.model.site_name2id("elb_TARGET_right") #blue, STATIC
++
++
+         self.palm_r = self.sim.model.site_name2id("palm_r")
+         self.target_qpos = self.sim.model.key_qpos[0].copy() # hand closing in on rail
+ 
+-        curr_dir = os.path.dirname(os.path.abspath(__file__))
+-        self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
+-        self.return_start_time = self.sim.data.time
+-        self.return_duration = 1.5  # seconds
++
++        # curr_dir = os.path.dirname(os.path.abspath(__file__))
++        # self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
++        # self.return_start_time = self.sim.data.time
++        # self.return_duration = 1.0  # seconds
+ 
+         super()._setup(obs_keys=obs_keys,
+                     weighted_reward_keys=weighted_reward_keys,
+@@ -72,6 +81,13 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+ 
+         self.obs_dict["palm_pos"] = self.sim.data.site_xpos[self.palm_r]
+ 
++        #calculate elb to return position
++        self.obs_dict['elb_return_err'] = self.sim.data.site_xpos[self.elb_r]- self.sim.data.site_xpos[self.elb_TARGET_right]
++        self.obs_dict['elb_return_err_l'] = self.sim.data.site_xpos[self.elb_l]- self.sim.data.site_xpos[self.elb_TARGET_left]
++
++
++
++
+         if self.sim.model.na>0:
+             self.obs_dict['act'] = self.sim.data.act[:].copy()
+ 
+@@ -91,25 +107,35 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+         return obs_dict
+ 
+     def get_reward_dict(self, obs_dict):
+-        step = int((self.sim.data.time - self.return_start_time) / self.return_duration * len(self.return_traj))
+-        step = np.clip(step, 0, len(self.return_traj) - 1)
+-        target_qpos = self.return_traj[step]
+-        current_qpos = self.sim.data.qpos.copy()
++        #_time) / self.return_duration * len(self.return_traj))
++        #step = np.clip(step, 0, len(self.return_traj) - 1)
++        # target_qpos = self.return_traj[step]
++        # #[13:27]
++        # current_qpos = self.sim.data.qpos
++        # #[13:27]
+ 
+ 
+ 
+-        traj_err = np.linalg.norm(current_qpos - target_qpos) / len(current_qpos)
++        # traj_err = np.linalg.norm(current_qpos - target_qpos) / len(current_qpos)
+         
++        elb_err_r = np.linalg.norm(self.sim.data.site_xpos[self.elb_r] - self.sim.data.site_xpos[self.elb_TARGET_right])
++        elb_err_l = np.linalg.norm(self.sim.data.site_xpos[self.elb_l] - self.sim.data.site_xpos[self.elb_TARGET_left])
++
++        elb_total_err = (elb_err_r + elb_err_l) 
++
++
+         rwd_dict = collections.OrderedDict((
+             # Optional shaping reward
+-            ('trajectory_rwd', -traj_err),
++            #('trajectory_rwd', -traj_err),
++            ('trajectory_rwd', 0),
++            ('elbow_target_rwd', -elb_total_err),
+ 
+             # MUST KEYS
+-            ('bonus', 1.0 * (traj_err < 0.2) + 1.0 * (traj_err < 0.1)),
+-            ('penalty', -1.0 * (traj_err > 1.5)),  # drop if far off path
+-            ('sparse', -10.0 * traj_err),
+-            ('solved', float(traj_err < 0.0025)),
+-            ('done', bool(traj_err > 1.5)),
++            ('bonus', 1.0 * (elb_total_err < 0.2) + 1.0 * (elb_total_err < 0.1)),
++            ('penalty', -1.0 * (elb_total_err > 1.5)),  # drop if far off path
++            ('sparse', -10.0 * elb_total_err),
++            ('solved', float(elb_total_err < 0.0025)),
++            ('done', bool(elb_total_err > 1.5)),
+         ))
+ 
+         
+@@ -118,15 +144,15 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+         return rwd_dict
+     
+     def reset(self, **kwargs):
+-        curr_dir = os.path.dirname(os.path.abspath(__file__))
+-        self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
+-        self.return_start_time = self.sim.data.time
+-        self.return_duration = 1.0  # seconds
++        # curr_dir = os.path.dirname(os.path.abspath(__file__))
++        # self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
++        # self.return_start_time = self.sim.data.time
++        # self.return_duration = 1.0  # seconds
+ 
+         self.robot.sync_sims(self.sim, self.sim_obsd)
+         obs = super().reset(**kwargs)
+ 
+-        self.sim.data.qpos[:] = self.sim.model.key_qpos[1]
+-        self.sim.data.qvel[:] = 0
++        # self.sim.data.qpos[:] = self.sim.model.key_qpos[1]
++        # self.sim.data.qvel[:] = 0
+ 
+         return obs
+\ No newline at end of file
+Submodule myosuite/simhive/myo_sim contains modified content
+diff --git a/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml b/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
+index df79631..b43e484 100644
+--- a/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
++++ b/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
+@@ -48,6 +48,11 @@
+         <site name="hand_start_left" pos="-0.101 -0.3142 -0.1024" size="0.008" rgba="1 0 0 1"/>
+         <site name="hand_TARGET_left" pos="-0.101 -0.4542 -0.395" size="0.008" rgba="0 0 1 1"/>
+ 
++        <site name="elb_TARGET_right" pos="0.5324 0.0 -0.1" size="0.008" rgba="0 0.4 1 1"/>
++
++        <site name="elb_TARGET_left" pos="-0.101 0.0 -0.1" size="0.008" rgba="0 0.4 1 1"/>
++
++
+         <body name = "right_rear_wheel" pos="0.4953 -0.5842 -0.1524">
+             <joint name= "right_rear" axis="-1 0 0" damping=".03"/>
+             <geom mesh= "rear_wheel2" pos="-0.4953 0.5842 0.1524" material="dark_grey" conaffinity="0" contype="0"/>
+diff --git a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml
+index 87b7359..a168e6a 100644
+--- a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml
++++ b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml
+@@ -115,6 +115,8 @@
+                             <joint axis="-0.998261 0.00229991 0.0588977" name="shoulder_elv" pos="0 0 0" range="0 3.142" user="9.61084e-06"/>
+                             <joint axis="0.00479995 0.999089 0.0423995" name="shoulder1_r2" pos="0 0 0" range="-2.242 1.658" user="-0.251642"/>
+                             <body name="humerus" pos="0 0 0">
++                                
++                               
+                                 <inertial diaginertia="0.0128576 0.0121576 0.00239265" mass="1.99757" pos="0.018064 -0.140141 -0.012746" quat="0.407851 0.343714 -0.567755 0.627034"/>
+                                 <joint axis="0.00479995 0.999089 0.0423995" name="shoulder_rot" pos="0 0 0" range="-1.571 2.094" user="0.161391"/>
+                                 <geom mesh="humerus_geom_1_humerus" name="humerus_geom_1" type="mesh"/>
+@@ -291,6 +293,9 @@
+                                 <site class="marker" name="R.Elbow.Lateral_marker" pos="0.00509 -0.2806 0.02884"/>
+                                 <site class="marker" name="R.Elbow.Medial_marker" pos="-0.00407 -0.2844 -0.05408"/>
+                                 <body name="ulna" pos="0.0061 -0.2904 -0.0123" childclass="elbow">
++                                    <site name="elb_r" pos="0 0 0" size="0.02" rgba="0 0.4 1 1"/>
++                                
++                                    
+                                     <inertial diaginertia="0.00543663 0.00523521 0.001" mass="1.1053" pos="0.00971783 -0.0959509 0.024286" quat="0.792048 0.609078 0.0156735 0.0379256"/>
+                                     <joint axis="0.0494004 0.0366003 0.998108" name="elbow_flexion" pos="0 0 0" range="0 2.269" user="1.05676"/>
+                                     <geom mesh="ulna_geom_1_ulna" name="ulna_geom_1" type="mesh"/>
+diff --git a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml
+index 556f64c..172cd6b 100644
+--- a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml
++++ b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml
+@@ -155,6 +155,7 @@ might be missing some other stuff
+ 
+ 
+                             <body name="humerusL" pos="0 0 0" euler="0 0 0"> <!-- DONE WITH MIRRORING -->
++                                
+ 
+                                 <inertial diaginertia="0.0128576 0.0121576 0.00239265" mass="1.99757" pos="-0.018064 -0.140141 -0.012746" quat="0.407851 -0.343714 0.567755 0.627034"/> <!-- not sure if needs modification -->
+                                 <joint axis="0.00479995 -0.999089 -0.0423995" name="shoulder_rotL" pos="0 0 0" range="-1.571 2.094" user="0.161391"/> <!-- joint is correct -->
+@@ -366,7 +367,8 @@ might be missing some other stuff
+ 
+ 
+                                 <body name="ulnaL" pos="-0.0061 -0.2904 -0.0123" childclass="elbow" euler="0 0 0">  <!-- DONE WITH MIRRORING -->
+-
++                                    <site name="elb_l" pos="0 0 0" size="0.02" rgba="0 0.4 1 1"/>
++                                
+ 
+ 
+ 
+diff --git a/runs/2025_08_01_16_48_29/myoHandWheelHoldFixed-v0_left_2025_08_01_16_48_29_1/events.out.tfevents.1754081321.Olivias-MacBook-Air-2.local.12146.0 b/runs/2025_08_01_16_48_29/myoHandWheelHoldFixed-v0_left_2025_08_01_16_48_29_1/events.out.tfevents.1754081321.Olivias-MacBook-Air-2.local.12146.0
+index 2e8487a..ff0ecc9 100644
+Binary files a/runs/2025_08_01_16_48_29/myoHandWheelHoldFixed-v0_left_2025_08_01_16_48_29_1/events.out.tfevents.1754081321.Olivias-MacBook-Air-2.local.12146.0 and b/runs/2025_08_01_16_48_29/myoHandWheelHoldFixed-v0_left_2025_08_01_16_48_29_1/events.out.tfevents.1754081321.Olivias-MacBook-Air-2.local.12146.0 differ
+diff --git a/wandb/latest-run b/wandb/latest-run
+index 90268cd..261c0d7 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20250801_164828-y3m9m7pn
+\ No newline at end of file
++run-20250801_183534-ek9jqqir
+\ No newline at end of file
+diff --git a/wandb/run-20250801_164828-y3m9m7pn/run-y3m9m7pn.wandb b/wandb/run-20250801_164828-y3m9m7pn/run-y3m9m7pn.wandb
+index 10c10f8..80752c3 100644
+Binary files a/wandb/run-20250801_164828-y3m9m7pn/run-y3m9m7pn.wandb and b/wandb/run-20250801_164828-y3m9m7pn/run-y3m9m7pn.wandb differ
