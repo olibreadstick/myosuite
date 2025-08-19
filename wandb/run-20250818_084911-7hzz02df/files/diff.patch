@@ -1,0 +1,338 @@
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py b/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
+index 69f4904..581a3cb 100644
+--- a/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
++++ b/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0.py
+@@ -63,10 +63,11 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+         self.target_qpos = self.sim.model.key_qpos[0].copy() # hand closing in on rail
+ 
+ 
+-        # curr_dir = os.path.dirname(os.path.abspath(__file__))
+-        # self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
+-        # self.return_start_time = self.sim.data.time
+-        # self.return_duration = 1.0  # seconds
++        curr_dir = os.path.dirname(os.path.abspath(__file__))
++        traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
++        self.return_traj = traj[:, 13:26]
++        self.return_start_time = self.sim.data.time
++        self.return_duration = 1.0  # seconds
+ 
+         super()._setup(obs_keys=obs_keys,
+                     weighted_reward_keys=weighted_reward_keys,
+@@ -97,8 +98,8 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+     def get_obs_dict(self, sim):
+         obs_dict = {}
+         obs_dict['time'] = np.array([sim.data.time])
+-        obs_dict['hand_qpos'] = sim.data.qpos[13:].copy()
+-        obs_dict['hand_qvel'] = sim.data.qvel[12:].copy()*self.dt
++        obs_dict['hand_qpos'] = sim.data.qpos[13:26].copy()
++        obs_dict['hand_qvel'] = sim.data.qvel[12:25].copy()*self.dt
+         obs_dict["palm_pos"] = sim.data.site_xpos[self.palm_r]
+ 
+         if sim.model.na>0:
+@@ -107,16 +108,16 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+         return obs_dict
+ 
+     def get_reward_dict(self, obs_dict):
+-        #_time) / self.return_duration * len(self.return_traj))
+-        #step = np.clip(step, 0, len(self.return_traj) - 1)
+-        # target_qpos = self.return_traj[step]
+-        # #[13:27]
+-        # current_qpos = self.sim.data.qpos
+-        # #[13:27]
++        step = int((self.sim.data.time - self.return_start_time) / self.return_duration * (len(self.return_traj) - 1))
++        step = np.clip(step, 0, len(self.return_traj) - 1)
++        target_qpos = self.return_traj[step]
++        #[13:27]
++        current_qpos = self.sim.data.qpos[13:26]
++        #[13:27]
+ 
+ 
+ 
+-        # traj_err = np.linalg.norm(current_qpos - target_qpos) / len(current_qpos)
++        traj_err = np.linalg.norm(current_qpos - target_qpos) / len(current_qpos)
+         
+         elb_err_r = np.linalg.norm(self.sim.data.site_xpos[self.elb_r] - self.sim.data.site_xpos[self.elb_TARGET_right])
+         elb_err_l = np.linalg.norm(self.sim.data.site_xpos[self.elb_l] - self.sim.data.site_xpos[self.elb_TARGET_left])
+@@ -126,16 +127,16 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+ 
+         rwd_dict = collections.OrderedDict((
+             # Optional shaping reward
+-            #('trajectory_rwd', -traj_err),
+-            ('trajectory_rwd', 0),
++            ('trajectory_rwd', -traj_err),
+             ('elbow_target_rwd', -elb_total_err),
++            ('act_reg', -0.001 * np.sum(obs_dict.get('act', 0.0)**2)),
+ 
+             # MUST KEYS
+-            ('bonus', 1.0 * (elb_total_err < 0.2) + 1.0 * (elb_total_err < 0.1)),
+-            ('penalty', -1.0 * (elb_total_err > 1.5)),  # drop if far off path
+-            ('sparse', -10.0 * elb_total_err),
+-            ('solved', float(elb_total_err < 0.0025)),
+-            ('done', bool(elb_total_err > 1.5)),
++            ('bonus', 1.0 * (traj_err < 0.2) + 2.0 * (traj_err < 0.1)),
++            ('penalty', -1.0 * (traj_err > 1.5)),  # drop if far off path
++            ('sparse', -10.0 * traj_err),
++            ('solved', float(traj_err < 0.0025)),
++            ('done', bool(traj_err > 1.5)),
+         ))
+ 
+         
+@@ -144,15 +145,16 @@ class WheelHoldFixedEnvV0Left(BaseV0):
+         return rwd_dict
+     
+     def reset(self, **kwargs):
+-        # curr_dir = os.path.dirname(os.path.abspath(__file__))
+-        # self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
+-        # self.return_start_time = self.sim.data.time
+-        # self.return_duration = 1.0  # seconds
++        curr_dir = os.path.dirname(os.path.abspath(__file__))
++        traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
++        self.return_traj = traj[:, 13:26]  
++        self.return_start_time = self.sim.data.time
++        self.return_duration = 1.0  # seconds
+ 
+         self.robot.sync_sims(self.sim, self.sim_obsd)
+         obs = super().reset(**kwargs)
+ 
+-        # self.sim.data.qpos[:] = self.sim.model.key_qpos[1]
+-        # self.sim.data.qvel[:] = 0
++        self.sim.data.qpos[:] = self.sim.model.key_qpos[1]
++        self.sim.data.qvel[:] = 0
+ 
+         return obs
+\ No newline at end of file
+diff --git a/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0_traj_elb.py b/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0_traj_elb.py
+deleted file mode 100644
+index 84cecb7..0000000
+--- a/myosuite/envs/myo/myowheelchair/myowheelchairleft/wheelhold_v0_traj_elb.py
++++ /dev/null
+@@ -1,157 +0,0 @@
+-""" =================================================
+-# Copyright (c) Facebook, Inc. and its affiliates
+-Authors  :: Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano (caggiano@gmail.com)
+-================================================= """
+-
+-# Trying trajectory approach
+-
+-import collections
+-import numpy as np
+-import math
+-from myosuite.utils import gym
+-import mujoco
+-import pandas as pd
+-import os
+-
+-
+-from myosuite.envs.myo.base_v0 import BaseV0
+-
+-
+-class WheelHoldFixedEnvV0Left(BaseV0):
+-
+-    DEFAULT_OBS_KEYS = ['time', 'hand_qpos', 'hand_qvel']
+-    DEFAULT_RWD_KEYS_AND_WEIGHTS = {
+-        "trajectory_rwd": 5.0,
+-        "elbow_target_rwd": 3.0,
+-        "bonus": 2.0,
+-        "penalty": 5.0,
+-    }
+-
+-    def __init__(self, model_path, obsd_model_path=None, seed=None, **kwargs):
+-
+-        # EzPickle.__init__(**locals()) is capturing the input dictionary of the init method of this class.
+-        # In order to successfully capture all arguments we need to call gym.utils.EzPickle.__init__(**locals())
+-        # at the leaf level, when we do inheritance like we do here.
+-        # kwargs is needed at the top level to account for injection of __class__ keyword.
+-        # Also see: https://github.com/openai/gym/pull/1497
+-        gym.utils.EzPickle.__init__(self, model_path, obsd_model_path, seed, **kwargs)
+-
+-        # This two step construction is required for pickling to work correctly. All arguments to all __init__
+-        # calls must be pickle friendly. Things like sim / sim_obsd are NOT pickle friendly. Therefore we
+-        # first construct the inheritance chain, which is just __init__ calls all the way down, with env_base
+-        # creating the sim / sim_obsd instances. Next we run through "setup"  which relies on sim / sim_obsd
+-        # created in __init__ to complete the setup.
+-        super().__init__(model_path=model_path, obsd_model_path=obsd_model_path, seed=seed, env_credits=self.MYO_CREDIT)
+-
+-        self._setup(**kwargs)
+-
+-
+-    def _setup(self,
+-            obs_keys:list = DEFAULT_OBS_KEYS,
+-            weighted_reward_keys:list = DEFAULT_RWD_KEYS_AND_WEIGHTS,
+-            **kwargs,
+-        ):
+-
+-        self.elb_l = self.sim.model.site_name2id("elb_l")
+-        self.elb_TARGET_left = self.sim.model.site_name2id("elb_TARGET_left") #blue, STATIC
+-
+-        self.elb_r = self.sim.model.site_name2id("elb_r")
+-        self.elb_TARGET_right = self.sim.model.site_name2id("elb_TARGET_right") #blue, STATIC
+-
+-
+-        self.palm_r = self.sim.model.site_name2id("palm_r")
+-        self.target_qpos = self.sim.model.key_qpos[0].copy() # hand closing in on rail
+-
+-
+-        curr_dir = os.path.dirname(os.path.abspath(__file__))
+-        self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
+-        self.return_start_time = self.sim.data.time
+-        self.return_duration = 1.0  # seconds
+-
+-        super()._setup(obs_keys=obs_keys,
+-                    weighted_reward_keys=weighted_reward_keys,
+-                    **kwargs,
+-        )
+-        self.init_qpos = self.sim.model.key_qpos[1].copy() # copy returning keyframe
+-        
+-    def get_obs_vec(self):
+-        self.obs_dict['time'] = np.array([self.sim.data.time])
+-        self.obs_dict['hand_qpos'] = self.sim.data.qpos[13:].copy()
+-        self.obs_dict['hand_qvel'] = self.sim.data.qvel[12:].copy()*self.dt
+-
+-        self.obs_dict["palm_pos"] = self.sim.data.site_xpos[self.palm_r]
+-
+-        #calculate elb to return position
+-        self.obs_dict['elb_return_err'] = self.sim.data.site_xpos[self.elb_r]- self.sim.data.site_xpos[self.elb_TARGET_right]
+-        self.obs_dict['elb_return_err_l'] = self.sim.data.site_xpos[self.elb_l]- self.sim.data.site_xpos[self.elb_TARGET_left]
+-
+-
+-
+-
+-        if self.sim.model.na>0:
+-            self.obs_dict['act'] = self.sim.data.act[:].copy()
+-
+-        t, obs = self.obsdict2obsvec(self.obs_dict, self.obs_keys)
+-        return obs
+-
+-    def get_obs_dict(self, sim):
+-        obs_dict = {}
+-        obs_dict['time'] = np.array([sim.data.time])
+-        obs_dict['hand_qpos'] = sim.data.qpos[13:].copy()
+-        obs_dict['hand_qvel'] = sim.data.qvel[12:].copy()*self.dt
+-        obs_dict["palm_pos"] = sim.data.site_xpos[self.palm_r]
+-
+-        if sim.model.na>0:
+-            obs_dict['act'] = sim.data.act[:].copy()
+-        
+-        return obs_dict
+-
+-    def get_reward_dict(self, obs_dict):
+-        step = int((self.sim.data.time - self.return_start_time) / self.return_duration * len(self.return_traj))
+-        step = np.clip(step, 0, len(self.return_traj) - 1)
+-        target_qpos = self.return_traj[step]
+-        #[13:27]
+-        current_qpos = self.sim.data.qpos
+-        #[13:27]
+-
+-
+-
+-        traj_err = np.linalg.norm(current_qpos - target_qpos) / len(current_qpos)
+-        
+-        elb_err_r = np.linalg.norm(self.sim.data.site_xpos[self.elb_r] - self.sim.data.site_xpos[self.elb_TARGET_right])
+-        elb_err_l = np.linalg.norm(self.sim.data.site_xpos[self.elb_l] - self.sim.data.site_xpos[self.elb_TARGET_left])
+-
+-        elb_total_err = (elb_err_r + elb_err_l) 
+-
+-
+-        rwd_dict = collections.OrderedDict((
+-            # Optional shaping reward
+-            ('trajectory_rwd', -traj_err),
+-            ('elbow_target_rwd', -elb_total_err),
+-
+-            # MUST KEYS
+-            ('bonus', 1.0 * (traj_err < 0.2) + 1.0 * (traj_err < 0.1)),
+-            ('penalty', -1.0 * (traj_err > 1.5)),  # drop if far off path
+-            ('sparse', -10.0 * traj_err),
+-            ('solved', float(traj_err < 0.0025)),
+-            ('done', bool(traj_err > 1.5)),
+-        ))
+-
+-        
+-        rwd_dict['dense'] = np.sum([wt * rwd_dict[key] for key, wt in self.rwd_keys_wt.items()])
+-        # self.prev_rwd_dict = rwd_dict  # Always update
+-        return rwd_dict
+-    
+-    def reset(self, **kwargs):
+-        curr_dir = os.path.dirname(os.path.abspath(__file__))
+-        self.return_traj = pd.read_csv(curr_dir + '/Return_Phase_Trajectory.csv').values
+-        self.return_start_time = self.sim.data.time
+-        self.return_duration = 1.0  # seconds
+-
+-        self.robot.sync_sims(self.sim, self.sim_obsd)
+-        obs = super().reset(**kwargs)
+-
+-        self.sim.data.qpos[:] = self.sim.model.key_qpos[1]
+-        self.sim.data.qvel[:] = 0
+-
+-        return obs
+\ No newline at end of file
+Submodule myosuite/simhive/myo_sim contains modified content
+diff --git a/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml b/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
+index df79631..b43e484 100644
+--- a/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
++++ b/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
+@@ -48,6 +48,11 @@
+         <site name="hand_start_left" pos="-0.101 -0.3142 -0.1024" size="0.008" rgba="1 0 0 1"/>
+         <site name="hand_TARGET_left" pos="-0.101 -0.4542 -0.395" size="0.008" rgba="0 0 1 1"/>
+ 
++        <site name="elb_TARGET_right" pos="0.5324 0.0 -0.1" size="0.008" rgba="0 0.4 1 1"/>
++
++        <site name="elb_TARGET_left" pos="-0.101 0.0 -0.1" size="0.008" rgba="0 0.4 1 1"/>
++
++
+         <body name = "right_rear_wheel" pos="0.4953 -0.5842 -0.1524">
+             <joint name= "right_rear" axis="-1 0 0" damping=".03"/>
+             <geom mesh= "rear_wheel2" pos="-0.4953 0.5842 0.1524" material="dark_grey" conaffinity="0" contype="0"/>
+diff --git a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml
+index 87b7359..a168e6a 100644
+--- a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml
++++ b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml
+@@ -115,6 +115,8 @@
+                             <joint axis="-0.998261 0.00229991 0.0588977" name="shoulder_elv" pos="0 0 0" range="0 3.142" user="9.61084e-06"/>
+                             <joint axis="0.00479995 0.999089 0.0423995" name="shoulder1_r2" pos="0 0 0" range="-2.242 1.658" user="-0.251642"/>
+                             <body name="humerus" pos="0 0 0">
++                                
++                               
+                                 <inertial diaginertia="0.0128576 0.0121576 0.00239265" mass="1.99757" pos="0.018064 -0.140141 -0.012746" quat="0.407851 0.343714 -0.567755 0.627034"/>
+                                 <joint axis="0.00479995 0.999089 0.0423995" name="shoulder_rot" pos="0 0 0" range="-1.571 2.094" user="0.161391"/>
+                                 <geom mesh="humerus_geom_1_humerus" name="humerus_geom_1" type="mesh"/>
+@@ -291,6 +293,9 @@
+                                 <site class="marker" name="R.Elbow.Lateral_marker" pos="0.00509 -0.2806 0.02884"/>
+                                 <site class="marker" name="R.Elbow.Medial_marker" pos="-0.00407 -0.2844 -0.05408"/>
+                                 <body name="ulna" pos="0.0061 -0.2904 -0.0123" childclass="elbow">
++                                    <site name="elb_r" pos="0 0 0" size="0.02" rgba="0 0.4 1 1"/>
++                                
++                                    
+                                     <inertial diaginertia="0.00543663 0.00523521 0.001" mass="1.1053" pos="0.00971783 -0.0959509 0.024286" quat="0.792048 0.609078 0.0156735 0.0379256"/>
+                                     <joint axis="0.0494004 0.0366003 0.998108" name="elbow_flexion" pos="0 0 0" range="0 2.269" user="1.05676"/>
+                                     <geom mesh="ulna_geom_1_ulna" name="ulna_geom_1" type="mesh"/>
+diff --git a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml
+index 556f64c..172cd6b 100644
+--- a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml
++++ b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml
+@@ -155,6 +155,7 @@ might be missing some other stuff
+ 
+ 
+                             <body name="humerusL" pos="0 0 0" euler="0 0 0"> <!-- DONE WITH MIRRORING -->
++                                
+ 
+                                 <inertial diaginertia="0.0128576 0.0121576 0.00239265" mass="1.99757" pos="-0.018064 -0.140141 -0.012746" quat="0.407851 -0.343714 0.567755 0.627034"/> <!-- not sure if needs modification -->
+                                 <joint axis="0.00479995 -0.999089 -0.0423995" name="shoulder_rotL" pos="0 0 0" range="-1.571 2.094" user="0.161391"/> <!-- joint is correct -->
+@@ -366,7 +367,8 @@ might be missing some other stuff
+ 
+ 
+                                 <body name="ulnaL" pos="-0.0061 -0.2904 -0.0123" childclass="elbow" euler="0 0 0">  <!-- DONE WITH MIRRORING -->
+-
++                                    <site name="elb_l" pos="0 0 0" size="0.02" rgba="0 0.4 1 1"/>
++                                
+ 
+ 
+ 
+diff --git a/wandb/latest-run b/wandb/latest-run
+index 535b4f0..56e3fea 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20250804_143444-yd73yg11
+\ No newline at end of file
++run-20250818_084911-7hzz02df
+\ No newline at end of file

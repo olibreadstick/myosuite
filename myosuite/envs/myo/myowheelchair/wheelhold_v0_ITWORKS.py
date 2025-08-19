@@ -58,7 +58,7 @@ class WheelHoldFixedEnvV0(BaseV0):
                     weighted_reward_keys=weighted_reward_keys,
                     **kwargs,
         )
-        self.init_qpos = self.sim.model.key_qpos[1].copy() # copy returning keyframe
+        self.init_qpos = self.sim.model.key_qpos[0].copy() # copy returning keyframe
         
     def get_obs_vec(self):
         self.obs_dict['time'] = np.array([self.sim.data.time])
@@ -133,7 +133,7 @@ class WheelHoldFixedEnvV0(BaseV0):
     def reset(self, **kwargs):
         obs = super().reset(**kwargs)
 
-        self.sim.data.qpos[:] = self.sim.model.key_qpos[1]
+        self.sim.data.qpos[:] = self.sim.model.key_qpos[0]
         self.sim.data.qvel[:] = 0
         self.sim.data.act[:] = 0
 
