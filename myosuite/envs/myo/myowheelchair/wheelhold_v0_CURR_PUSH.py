@@ -90,7 +90,7 @@ class WheelHoldFixedEnvV0(BaseV0):
                     **kwargs,
         )
         
-        self.init_qpos = self.sim.model.key_qpos[0].copy() # copy the sitting + grabbing wheels keyframe
+        self.init_qpos = self.sim.model.key_qpos[1].copy() # copy the sitting + grabbing wheels keyframe
 
 
 
