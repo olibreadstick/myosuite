@@ -3,7 +3,7 @@
 Authors  :: Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano (caggiano@gmail.com)
 ================================================= """
 
-# Trying trajectory approach
+# returning mechanism, functional after 6e6 timesteps
 
 import collections
 import numpy as np

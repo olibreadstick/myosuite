@@ -15,11 +15,11 @@ if __name__ == "__main__":
 
 
     model = PPO("MlpPolicy", env, verbose=0)
-    pi = PPO.load(r"/Users/oliviacardillo/myosuite/myosuite3/MPL_baselines_left/policy_best_model_left/myoHandWheelHoldFixed-v0_left/2025_08_04_14_34_45/best_model.zip")
+    pi = PPO.load(r"C:\Users\jasmi\Documents\GitHub\myosuite\MPL_baselines_left\policy_best_model_left\myoHandWheelHoldFixed-v0_left\2025_08_26_11_10_13\best_model.zip")
 
     # render
     frames = []
-    for _ in range(800):
+    for _ in range(500):
         frames.append(env.sim.renderer.render_offscreen(width=400, height=400, camera_id=1)) 
         o = env.get_obs()
         a = pi.predict(o)[0]
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     # make a local copy
     skvideo.io.vwrite(
-        curr_dir+"/videos/HandFocusedRender_elb_only_from_2025_08_04_14_34_45.mp4",
+        curr_dir+"/videos/returning_test.mp4",
         np.asarray(frames),
         outputdict={"-pix_fmt": "yuv420p", "-r": "10"},
     )
