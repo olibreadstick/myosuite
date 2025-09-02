@@ -1,0 +1,110 @@
+diff --git a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+index f1c95be..7262392 100644
+--- a/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
++++ b/myosuite/envs/myo/myowheelchair/ParallelTrainingScriptWandB.py
+@@ -175,23 +175,23 @@ if __name__ == "__main__":
+ 
+     print("Begin training")
+ 
+-    model = PPO('MlpPolicy', envs, 
+-                learning_rate=0.0001,
+-                n_steps=4096,       # ← increase from default 2048
+-                batch_size=256,     # ← increase from default 64
+-                verbose=1, ent_coef=0.001, 
+-                policy_kwargs=policy_kwargs,
+-                tensorboard_log=f"runs/{time_now}")
+-    
+-    #TODO TRY LOADING
+-    # model_num =  '2025_08_18_18_53_56'
+-    # model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs,
++    # model = PPO('MlpPolicy', envs, 
+     #             learning_rate=0.0001,
+     #             n_steps=4096,       # ← increase from default 2048
+     #             batch_size=256,     # ← increase from default 64
+     #             verbose=1, ent_coef=0.001, 
+     #             policy_kwargs=policy_kwargs,
+     #             tensorboard_log=f"runs/{time_now}")
++    
++    #TODO TRY LOADING
++    model_num =  '2025_08_19_12_44_20'
++    model = PPO.load('./MPL_baselines/policy_best_model'+ '/'+ env_name + '/' + model_num + r'/best_model', envs,
++                learning_rate=0.0001,
++                n_steps=4096,       # ← increase from default 2048
++                batch_size=256,     # ← increase from default 64
++                verbose=1, ent_coef=0.001, 
++                policy_kwargs=policy_kwargs,
++                tensorboard_log=f"runs/{time_now}")
+ 
+     obs_callback = TensorboardCallback()
+     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
+Submodule myosuite/simhive/myo_sim contains modified content
+diff --git a/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml b/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
+index df79631..93b5b4e 100644
+--- a/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
++++ b/myosuite/simhive/myo_sim/wheelchair/assets/myowheelchair_chain.xml
+@@ -48,6 +48,11 @@
+         <site name="hand_start_left" pos="-0.101 -0.3142 -0.1024" size="0.008" rgba="1 0 0 1"/>
+         <site name="hand_TARGET_left" pos="-0.101 -0.4542 -0.395" size="0.008" rgba="0 0 1 1"/>
+ 
++        <site name="elb_TARGET_right" pos="0.5324 -0.05 -0.2" size="0.008" rgba="0 0.4 1 1"/>
++
++        <site name="elb_TARGET_left" pos="-0.101 -0.05 -0.2" size="0.008" rgba="0 0.4 1 1"/>
++
++
+         <body name = "right_rear_wheel" pos="0.4953 -0.5842 -0.1524">
+             <joint name= "right_rear" axis="-1 0 0" damping=".03"/>
+             <geom mesh= "rear_wheel2" pos="-0.4953 0.5842 0.1524" material="dark_grey" conaffinity="0" contype="0"/>
+diff --git a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml
+index 87b7359..a168e6a 100644
+--- a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml
++++ b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc.xml
+@@ -115,6 +115,8 @@
+                             <joint axis="-0.998261 0.00229991 0.0588977" name="shoulder_elv" pos="0 0 0" range="0 3.142" user="9.61084e-06"/>
+                             <joint axis="0.00479995 0.999089 0.0423995" name="shoulder1_r2" pos="0 0 0" range="-2.242 1.658" user="-0.251642"/>
+                             <body name="humerus" pos="0 0 0">
++                                
++                               
+                                 <inertial diaginertia="0.0128576 0.0121576 0.00239265" mass="1.99757" pos="0.018064 -0.140141 -0.012746" quat="0.407851 0.343714 -0.567755 0.627034"/>
+                                 <joint axis="0.00479995 0.999089 0.0423995" name="shoulder_rot" pos="0 0 0" range="-1.571 2.094" user="0.161391"/>
+                                 <geom mesh="humerus_geom_1_humerus" name="humerus_geom_1" type="mesh"/>
+@@ -291,6 +293,9 @@
+                                 <site class="marker" name="R.Elbow.Lateral_marker" pos="0.00509 -0.2806 0.02884"/>
+                                 <site class="marker" name="R.Elbow.Medial_marker" pos="-0.00407 -0.2844 -0.05408"/>
+                                 <body name="ulna" pos="0.0061 -0.2904 -0.0123" childclass="elbow">
++                                    <site name="elb_r" pos="0 0 0" size="0.02" rgba="0 0.4 1 1"/>
++                                
++                                    
+                                     <inertial diaginertia="0.00543663 0.00523521 0.001" mass="1.1053" pos="0.00971783 -0.0959509 0.024286" quat="0.792048 0.609078 0.0156735 0.0379256"/>
+                                     <joint axis="0.0494004 0.0366003 0.998108" name="elbow_flexion" pos="0 0 0" range="0 2.269" user="1.05676"/>
+                                     <geom mesh="ulna_geom_1_ulna" name="ulna_geom_1" type="mesh"/>
+diff --git a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml
+index 556f64c..172cd6b 100644
+--- a/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml
++++ b/myosuite/simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_body_for_wc_left.xml
+@@ -155,6 +155,7 @@ might be missing some other stuff
+ 
+ 
+                             <body name="humerusL" pos="0 0 0" euler="0 0 0"> <!-- DONE WITH MIRRORING -->
++                                
+ 
+                                 <inertial diaginertia="0.0128576 0.0121576 0.00239265" mass="1.99757" pos="-0.018064 -0.140141 -0.012746" quat="0.407851 -0.343714 0.567755 0.627034"/> <!-- not sure if needs modification -->
+                                 <joint axis="0.00479995 -0.999089 -0.0423995" name="shoulder_rotL" pos="0 0 0" range="-1.571 2.094" user="0.161391"/> <!-- joint is correct -->
+@@ -366,7 +367,8 @@ might be missing some other stuff
+ 
+ 
+                                 <body name="ulnaL" pos="-0.0061 -0.2904 -0.0123" childclass="elbow" euler="0 0 0">  <!-- DONE WITH MIRRORING -->
+-
++                                    <site name="elb_l" pos="0 0 0" size="0.02" rgba="0 0.4 1 1"/>
++                                
+ 
+ 
+ 
+diff --git a/wandb/latest-run b/wandb/latest-run
+index 1f99b5f..05b7384 120000
+--- a/wandb/latest-run
++++ b/wandb/latest-run
+@@ -1 +1 @@
+-run-20250819_124418-6k92yapp
+\ No newline at end of file
++run-20250820_085825-qkiu7uac
+\ No newline at end of file
