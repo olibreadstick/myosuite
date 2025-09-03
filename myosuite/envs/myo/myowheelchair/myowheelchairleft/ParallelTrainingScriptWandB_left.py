@@ -177,25 +177,6 @@ if __name__ == "__main__":
 
     print("Begin training")
 
-<<<<<<< Updated upstream
-    model = PPO('MlpPolicy', envs, 
-                # learning_rate=0.0001,
-                # n_steps=4096,       # ← increase from default 2048
-                # batch_size=256,     # ← increase from default 64
-                verbose=1, ent_coef=0.001, 
-                policy_kwargs=policy_kwargs,
-                tensorboard_log=f"runs/{time_now}")
-    
-    # # TODO TRY LOADING
-    # model_num =  '2025_08_26_11_10_13'
-    # model = PPO.load('./MPL_baselines_left/policy_best_model_left'+ '/'+ env_name + '/' + model_num + r'/best_model', envs,
-    #             learning_rate=0.0001,
-    #             n_steps=4096,       # ← increase from default 2048
-    #             batch_size=256,     # ← increase from default 64
-    #             verbose=1, ent_coef=0.001, 
-    #             policy_kwargs=policy_kwargs,
-    #             tensorboard_log=f"runs/{time_now}")
-=======
     model = PPO('MlpPolicy', envs, verbose=1, ent_coef=0.001,
             policy_kwargs=policy_kwargs,
             tensorboard_log=f"runs/{time_now}")
@@ -205,7 +186,6 @@ if __name__ == "__main__":
     #model_num = '2025_07_29_16_32_04'
     model_num = '2025_08_18_09_42_39'
     model = PPO.load('./MPL_baselines_left/policy_best_model_left'+ '/'+ env_name + '/' + model_num + r'/best_model', envs, verbose = 1, ent_coeff = 0.01, policy_kwargs = policy_kwargs, tensorboard_log=f"runs/{time_now}")
->>>>>>> Stashed changes
 
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])#, obs_callback])
