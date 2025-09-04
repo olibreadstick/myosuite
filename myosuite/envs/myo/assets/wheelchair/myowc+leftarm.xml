@@ -10,10 +10,6 @@
 
     <include file="../../../../simhive/myo_sim/scene/myosuite_scene_noPedestal.xml"/>
     <include file="../../../../simhive/myo_sim/wheelchairandhuman/assets/myotorso_abdomen_assets.xml"/>
-    <!-- 
-    <include file="../../../../simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_assets_for_wc.xml"/>
-    
-    -->
     <include file="../../../../simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myoarm_assets_for_wc_left.xml"/>
     <include file="../../../../simhive/myo_sim/wheelchairandhuman/Wheelchairwitharm/myolegs_assets_for_wc.xml"/>
     <include file="../../../../simhive/myo_sim/wheelchair/assets/myowheelchair_assets.xml"/>
