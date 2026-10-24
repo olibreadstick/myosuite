@@ -4,10 +4,10 @@ import time
 import mujoco.viewer
 from myosuite import make_env
 
-env = make_env("myoChallengeBoxingP0-v0")
+env = make_env("myoChallengeBoxingVs-v0")
 obs, info = env.reset(seed=0)
 
-print("BoxingP0 loaded!")
+print("BoxingVs loaded!")
 print("Opening MuJoCo viewer...")
 
 try:
