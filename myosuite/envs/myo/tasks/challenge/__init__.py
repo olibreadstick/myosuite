@@ -21,6 +21,7 @@ from myosuite.envs.myo.tasks.mimic.chasetag_obs import (
 
 _ASSETS_ROOT = pathlib.Path(__file__).parents[2] / "assets"
 
+from gymnasium.envs.registration import WrapperSpec
 
 def _reg(env_id, entry_point, max_episode_steps, kwargs):
     """Register base env plus myo* muscle-condition variants."""
@@ -548,3 +549,50 @@ except Exception as _e:  # noqa: BLE001
 
     _w.warn(f"Chase-tag VS env not registered: {_e}", stacklevel=1)
     del _e, _w
+
+
+_BOXING_SINGLE_AGENT_WRAPPER = WrapperSpec(
+    name="ModularMultiAgentSingleAgentWrapper",
+    entry_point=(
+        "myosuite.envs.multi_agent_modular_env:"
+        "ModularMultiAgentSingleAgentWrapper"
+    ),
+    kwargs=None,
+)
+
+
+# Capstone 2026-27: Boxing environments
+
+_registry.register_env(
+    env_id="myoChallengeBoxingP0-v0",
+    entry_point=(
+        "myosuite.envs.myo.tasks.challenge.boxing_mannequin."
+        "boxing_mannequin_env:make_boxing_6targets"
+    ),
+    max_episode_steps=500,
+    additional_wrappers=(_BOXING_SINGLE_AGENT_WRAPPER,),
+    wrap_mj_instability_termination=False,
+)
+
+_registry.register_env(
+    env_id="myoChallengeBoxingMannequin-v0",
+    entry_point=(
+        "myosuite.envs.myo.tasks.challenge.boxing_mannequin."
+        "boxing_mannequin_env:make_boxing_mannequin_env"
+    ),
+    max_episode_steps=500,
+    additional_wrappers=(_BOXING_SINGLE_AGENT_WRAPPER,),
+    wrap_mj_instability_termination=False,
+)
+
+_registry.register_env(
+    env_id="myoChallengeBoxingVs-v0",
+    entry_point=(
+        "myosuite.envs.myo.tasks.challenge.boxing_vs."
+        "boxing_vs_env:BoxingVsEnv"
+    ),
+    max_episode_steps=500,
+    time_limit=False,
+    wrap_mj_instability_termination=False,
+)
+
