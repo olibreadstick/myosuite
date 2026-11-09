@@ -66,3 +66,56 @@ def test_detect_finds_alternating_punches() -> None:
     assert [p["hand"] for p in punches] == ["R", "L", "R"]
     for a, b in itertools.pairwise(punches):
         assert a["end"] <= b["start"]
+
+
+def test_cut_starts_and_ends_in_guard() -> None:
+    skills = boxing_skills.load_manifest()
+    guard = boxing_skills.guard_qpos(skills)
+    skill = next(s for s in skills if s.name == "punch_R_push1")
+    src = np.load(boxing_skills.CLIP_DIR / f"{skill.clip}.npz")
+    out = boxing_skills.cut_skill(skill, guard)
+    n, lead = skill.end - skill.start, int(out["lead_frames"])
+    assert lead == skill.lead
+    for k in boxing_skills.PER_FRAME:
+        assert out[k].shape[0] == n + skill.blend + skill.pad, k
+        np.testing.assert_array_equal(
+            out[k][lead:n], src[k][skill.start + lead : skill.end]
+        )
+    q = out["qpos"].astype(np.float64)
+    step = np.abs(np.diff(q[:, 7:], axis=0)).max(axis=1)
+    # Starts and ends in the guard's joint pose and height, at rest at the end.
+    for i in (0, -1):
+        np.testing.assert_allclose(q[i, 7:], guard[7:], atol=1e-6)
+        np.testing.assert_allclose(q[i, 2], guard[2], atol=1e-6)
+    assert not out["qvel"][n + skill.blend - 1 :].any()
+    # No jump where generated frames meet the mocap.
+    assert step[lead - 1] <= 1.5 * step[lead]
+    assert step[n - 1] <= 1.5 * step[n - 2]
+    # The root stays where the punch ended instead of sliding to the guard's spot.
+    assert np.linalg.norm(q[-1, :2] - q[n - 1, :2]) < 0.1
+
+
+def test_anchor_continues_from_previous_skill() -> None:
+    skills = boxing_skills.load_manifest()
+    guard = boxing_skills.guard_qpos(skills)
+    a, b = (
+        boxing_skills.cut_skill(s, guard)["qpos"].astype(np.float64)
+        for s in skills
+        if s.name in ("punch_R_push1", "punch_L_stand1")
+    )
+    moved = boxing_skills.anchor_qpos(b, a[-1])
+    np.testing.assert_allclose(moved[0], a[-1], atol=1e-5)
+    np.testing.assert_allclose(moved[:, 7:], b[:, 7:])
+    np.testing.assert_allclose(moved[:, 2], b[:, 2])
+
+
+def test_guard_joint_overrides() -> None:
+    skills = boxing_skills.load_manifest()
+    guard = next(s for s in skills if s.name == "guard")
+    base = boxing_skills.guard_qpos(skills)
+    guard.joints = {"elbow_flex_r": 2.0}
+    adr = boxing_skills.fullbody_model().joint("elbow_flex_r").qposadr[0]
+    changed = boxing_skills.guard_qpos(skills)
+    assert changed[adr] == 2.0
+    np.testing.assert_array_equal(np.delete(changed, adr), np.delete(base, adr))
+    assert boxing_skills.cut_skill(guard, changed)["qpos"][0, adr] == np.float32(2.0)

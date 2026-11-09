@@ -3,14 +3,19 @@
 # kind = menu group the high-level policy chooses from; variants in a group are
 # interchangeable. Punch ranges come from 'boxing_skills.py detect' (cuts at minima
 # of the combined hand reach); the rest were picked from the signal plots.
+# Each skill starts in the guard pose and eases into the mocap over 'lead' frames
+# (default 20), gets 'blend' generated frames (default 40) returning it to guard, then
+# 'pad' held frames (default 15). The guard pose is the first frame of 'guard', with
+# optional 'joints' overrides in radians, e.g. joints: {elbow_flex_r: 2.2}.
 # Dropped after review: punch_R_running2 (running clip 252-292, arms fall into a run).
 skills:
   guard:
-    clip: punchboxing_push_poses
-    frames: [41, 42]
+    clip: punchboxing_walk_poses
+    frames: [154, 155]
     pad: 49
+    blend: 0
     kind: guard
-    note: static guard pose held 0.5 s (start pose of the push-clip punches)
+    note: static hands-up guard held 0.5 s (both hands closest to the head between punches)
   punch_R_push1:
     clip: punchboxing_push_poses
     frames: [45, 90]
