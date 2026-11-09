@@ -53,6 +53,7 @@ dependencies = [
     # reference gait clips at runtime via hf_hub_download -- not gated behind
     # the [musclemimic] extra since these envs are reachable via plain make_env.
     "huggingface_hub>=0.20",
+    "bvh>=0.3",
 ]
 [project.optional-dependencies]
 # Reinforcement learning training with Stable-Baselines3
