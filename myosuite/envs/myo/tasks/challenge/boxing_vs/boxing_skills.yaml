@@ -16,6 +16,13 @@ skills:
     blend: 0
     kind: guard
     note: static hands-up guard held 0.5 s (both hands closest to the head between punches)
+  guard_short:
+    clip: punchboxing_walk_poses
+    frames: [154, 155]
+    pad: 24
+    blend: 0
+    kind: guard
+    note: the guard pose held 0.25 s (a quick block)
   punch_R_push1:
     clip: punchboxing_push_poses
     frames: [45, 90]

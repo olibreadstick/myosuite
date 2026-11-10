@@ -35,10 +35,15 @@ from typing import Any
 import numpy as np
 import yaml
 
+from myosuite.envs.myo.tasks.challenge.boxing_vs.skill_library import (
+    MANIFEST,
+    SKILL_DIR,
+    anchor_qpos,
+    yaw_quat,
+)
+
 REPO = Path(__file__).resolve().parents[1]
 CLIP_DIR = REPO / "boxing_motions/MyoFullBody/gmr/Transitions_mocap/mazen_c3d"
-SKILL_DIR = REPO / "boxing_motions/MyoFullBody/gmr/skills"
-MANIFEST = REPO / "myosuite/envs/myo/tasks/challenge/boxing_vs/boxing_skills.yaml"
 VIDEO_DIR = REPO / "logs/videos/boxing_skills"
 
 # Per-frame arrays that are sliced; everything else in the .npz is model metadata.
@@ -260,12 +265,6 @@ def guard_qpos(skills: list[Skill]) -> np.ndarray:
     return qpos
 
 
-def _yaw(quat: np.ndarray) -> np.ndarray:
-    """Heading-only part (rotation about world z) of a wxyz quaternion."""
-    yaw = np.array([quat[0], 0.0, 0.0, quat[3]])
-    return yaw / np.linalg.norm(yaw)
-
-
 def _smoothstep(x: np.ndarray) -> np.ndarray:
     return 3 * x**2 - 2 * x**3
 
@@ -277,36 +276,9 @@ def _guard_at(q: np.ndarray, q_guard: np.ndarray) -> np.ndarray:
     out = np.asarray(q_guard, np.float64).copy()
     out[:2] = q[:2]
     yaw_inv, tilt = np.zeros(4), np.zeros(4)
-    mujoco.mju_negQuat(yaw_inv, _yaw(out[3:7]))
+    mujoco.mju_negQuat(yaw_inv, yaw_quat(out[3:7]))
     mujoco.mju_mulQuat(tilt, yaw_inv, out[3:7])
-    mujoco.mju_mulQuat(out[3:7], _yaw(np.asarray(q[3:7], np.float64)), tilt)
-    return out
-
-
-def anchor_qpos(qpos: np.ndarray, q_from: np.ndarray) -> np.ndarray:
-    """Move a clip so its first frame sits at the root position and heading of ``q_from``.
-
-    Args:
-        qpos: Clip poses ``(n, nq)``.
-        q_from: Pose to continue from (e.g. the previous skill's last frame).
-
-    Returns:
-        Re-anchored copy of ``qpos``.
-    """
-    import mujoco
-
-    out = np.asarray(qpos, np.float64).copy()
-    turn, start_inv = np.zeros(4), np.zeros(4)
-    mujoco.mju_negQuat(start_inv, _yaw(out[0, 3:7]))
-    mujoco.mju_mulQuat(turn, _yaw(np.asarray(q_from[3:7], np.float64)), start_inv)
-    start = out[0, :3].copy()
-    for q in out:
-        offset = q[:3] - start
-        mujoco.mju_rotVecQuat(q[:3], offset, turn)
-        q[:2] += q_from[:2]
-        q[2] = start[2] + offset[2]
-        quat = q[3:7].copy()
-        mujoco.mju_mulQuat(q[3:7], turn, quat)
+    mujoco.mju_mulQuat(out[3:7], yaw_quat(np.asarray(q[3:7], np.float64)), tilt)
     return out
 
 
