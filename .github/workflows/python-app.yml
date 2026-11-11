@@ -1,28 +1,28 @@
-# This workflow will install Python dependencies, run tests
+# This workflow installs Python dependencies and runs tests using uv.
 
 name: Python application
 
 on:
   push:
-    branches: [ "main" , "dev"]
+    branches: ["main", "dev"]
     paths-ignore:
       - "docs/**"
+      - ".github/**"
       - "**/README.md"
 
   pull_request:
-    branches: [ "main" , "dev"]
+    branches: ["main", "dev"]
     paths-ignore:
       - "docs/**"
+      - ".github/**"
       - "**/README.md"
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
-  build:
-    env:
-      DISPLAY: :0
+  core:
+    name: Core (${{ matrix.os }}, py${{ matrix.python-version }})
 
     defaults:
       run:
@@ -30,97 +30,74 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os:
           - macos-latest
           - ubuntu-latest
           - windows-latest
+        python-version: ["3.10"]
+        # 3.12 and 3.14 run on Linux only: they exercise the full suite, and the risks they
+        # guard (dependency resolution, Python-level incompatibilities) are OS-independent.
+        # 3.12 matters specifically because NumPy resolves to >=2.3 there (3.10 still resolves
+        # 2.2.x, which only deprecates rather than removes implicit shape-(1,)-array-to-scalar
+        # conversion -- the exact class of bug the ``_as_mj_int``-style guards in
+        # myosuite/envs/myo/tasks/challenge/ exist for). The [mjlab] extra resolves to torch +
+        # warp-lang here, since mjlab caps itself at <3.14 upstream.
+        include:
+          - os: ubuntu-latest
+            python-version: "3.12"
+          - os: ubuntu-latest
+            python-version: "3.14"
 
     steps:
-    - name: Set environment variable for macOS
-      if: ${{ runner.os == 'macOS' }}
-      run: echo "SYSTEM_VERSION_COMPAT=0" >> $GITHUB_ENV
+      - name: Set environment variable for macOS
+        if: ${{ runner.os == 'macOS' }}
+        run: echo "SYSTEM_VERSION_COMPAT=0" >> $GITHUB_ENV
 
-    - name: Checkout repository and submodules
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.8"
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Prepare Linux
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        sudo apt-get update -y -qq
-        sudo apt-get install -y xvfb x11-xserver-utils
-        sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
 
-    - name: Enable Conda (macOS)
-      if: ${{ runner.os == 'macOS' }}
-      uses: conda-incubator/setup-miniconda@v3
-      with:
-        auto-activate-base: false
-        python-version: "3.8"
+      - name: Create virtual environment
+        run: uv venv --python ${{ matrix.python-version }}
 
-    - name: Enable Conda (window/ubuntu)
-      if: ${{ runner.os != 'macOS' }}
-      uses: conda-incubator/setup-miniconda@v3
-      with:
-        auto-activate-base: false
+      - name: Prepare Linux (headless OpenGL for MuJoCo / notebooks)
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y xvfb libgl1 libegl1
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          echo "MUJOCO_GL=egl" >> $GITHUB_ENV
+          sudo /usr/bin/Xvfb :99 -screen 0 1280x1024x24 &
+          sleep 1
 
-    - name: Test Conda
-      run: |
-          conda info
-          CONDA_DEFAULT_ENV=test_myosuite
-          conda create --name $CONDA_DEFAULT_ENV python=3.8 -y
-          conda activate $CONDA_DEFAULT_ENV
+      # [rl] (Stable-Baselines3) so the SB3 tests run instead of skipping, among
+      # them the tier-1 SB3 -> ONNX export check (test_export_onnx.py).
+      - name: Install project and pytest
+        run: |
+          uv pip install -e ".[mjlab,rl]"
+          uv pip install pytest pytest-xvfb ffmpeg torch ipython "musclemimic_models==1.0.6"
 
-#     - name: Prepare MacOS
-#       if: ${{ runner.os == 'macOS' }}
-#       run: |
-#         brew install --cask xquartz
-#         brew install hdf5
-#         export CPATH="/opt/homebrew/include/"
-#         export HDF5_DIR=/opt/homebrew/
-#         pip3 install h5py --only-binary h5py
+      - name: Pytest tier-1 (fast, backend-agnostic contracts)
+        if: ${{ runner.os != 'Linux' }}
+        run: uv run python -m pytest -o addopts= myosuite/tests -m "tier1 and not slow" -v
 
-    - name: Install dependencies
-      run: |
-        conda activate $CONDA_DEFAULT_ENV
-        python3 -m pip install --upgrade pip
-        pip3 install -e .
+      - name: Pytest — full suite (tier 1–3, all backends; excludes @slow)
+        if: ${{ runner.os == 'Linux' }}
+        run: uv run python -m pytest -o addopts= myosuite/tests -v -m "not slow"
 
-    - name: Run MuJoCo Rendering test
-      if: ${{ runner.os == 'Linux' }}
-      run: python3 -m mujoco.render_test
-
-    - name: Test myoapi
-      run: |
-        conda activate $CONDA_DEFAULT_ENV
-        python3 -m myosuite.tests.test_myoapi
-
-    - name: Run Test environment
-      run: |
-        python3 -m myosuite.tests.test_myo
-
-    - name: Install ffmpeg
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        sudo apt-get install --no-install-recommends ffmpeg && pip3 install ffmpeg scikit-video
-
-    - name: Test rendering
-      if: ${{ runner.os == 'Linux' }}
-      run: python3 -m myosuite.utils.examine_env -e myoElbowPose1D6MRandom-v0 -r offscreen -n 1
-
-    - name: Run Test jupyter-notebooks tutorials
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        source myosuite/tests/test_tutorials.sh
-
-    - name: Run Test gym/gymnasium + stable-baselines3
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        source myosuite/tests/test_versions.sh
+      # Pinned to 3.10: several tutorials depend on packages with tighter ceilings
+      # than the library itself.
+      - name: Execute tutorials (discovered; HF-heavy notebooks skipped in CI)
+        if: ${{ runner.os == 'Linux' && matrix.python-version == '3.10' }}
+        run: source myosuite/tests/test_tutorials.sh

@@ -1,74 +1,72 @@
 Installation
 ============
 
-.. _installation:
+Python 3.10–3.14 is supported (the GPU ``[mjlab]`` extra needs Python ≤3.13).
 
-MyoSuite uses git submodules to resolve dependencies.
-Please follow steps exactly as below to install correctly.
-
-Requirements
-~~~~~~~~~~~~
-* python >= 3.8 (if needed follow instructions `here <https://docs.conda.io/en/latest/miniconda.html>`_ for installing python and conda)
-* mujoco >= 2.3.6
-
-
-Installing the pip package
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: bash
-
-   conda create --name MyoSuite python=3.8
-   conda activate MyoSuite
-   pip install -U myosuite
-
-
-(alternative) Installing from source
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To get started with MyoSuite, clone this repo with pre-populated submodule dependencies
-
-.. code-block:: bash
-
-   git clone --recursive https://github.com/facebookresearch/myosuite.git
-   cd myosuite
-   pip install -e .
-
-Testing the installation
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can test the installation using
-
-.. code-block:: bash
-
-   python -m myosuite.tests.test_myo
-
-You can visualize the environments with random controls using the below command
-
-.. code-block:: bash
-
-   python -m myosuite.utils.examine_env --env_name myoElbowPose1D6MRandom-v0
-   
-.. note::
-   On MacOS, the need of a launch_passive option might require that the Python script be run under `mjpython` i.e. 
-   `mjpython -m myosuite.utils.examine_env --env_name myoElbowPose1D6MRandom-v0`
-
-Examples
+From PyPI
 ~~~~~~~~~
 
-It is possible to create and interface with MyoSuite environments like any other OpenAI gym environments.
-For example, to use the ``myoElbowPose1D6MRandom-v0`` environment it is possible simply to run:
+.. code-block:: bash
+
+   pip install -U myosuite
+
+From source
+~~~~~~~~~~~
+
+.. code-block:: bash
+
+   git clone https://github.com/MyoHub/myosuite.git
+   cd myosuite
+   pip install -e ".[rl]"        # CPU training (Stable-Baselines3)
+   # or with uv: uv sync -p 3.10 --extra rl
+
+GPU training (mjlab)
+~~~~~~~~~~~~~~~~~~~~
+
+An NVIDIA GPU on Linux (tested) or Windows; on macOS mjlab runs on the CPU only. The torch and Warp wheels on PyPI are built for the newest CUDA; on an
+older driver they install but cannot use the GPU. `uv <https://docs.astral.sh/uv/>`_ picks the torch
+build that matches your driver:
+
+.. code-block:: bash
+
+   uv pip install -e ".[mjlab]" --torch-backend=auto
+   # with pip: install a matching torch first (nvidia-smi shows the driver's CUDA version), e.g.
+   # pip install torch --index-url https://download.pytorch.org/whl/cu129 && pip install -e ".[mjlab]"
+
+On a CUDA 12 driver, also install the CUDA 12 build of Warp from its
+`releases <https://github.com/NVIDIA/warp/releases>`_ (otherwise mjlab fails with
+``Invalid device identifier: cuda:0``), e.g. on Linux
+``pip install --force-reinstall --no-deps https://github.com/NVIDIA/warp/releases/download/v1.18.0/warp_lang-1.18.0+cu12-py3-none-manylinux_2_28_x86_64.whl``.
+
+Musculoskeletal models ship in the ``myo-sim`` pip package; the few MPL, YCB and
+furniture assets MyoSuite uses are bundled in the package. No git submodule checkout is required.
+A source install uses the ``myo-sim`` pin in ``pyproject.toml``.
+
+Verify
+~~~~~~
+
+.. code-block:: bash
+
+   python -c "import myosuite; print(len(myosuite.myosuite_env_suite), 'envs')"
+   python -m myosuite.utils.examine_env --env_name myoElbowPose1D6MRandom-v0
+
+On macOS the viewer needs ``mjpython`` instead of ``python``.
+
+.. note::
+
+   Run these commands from a directory that does not directly contain a folder named ``myosuite``, such as
+   the parent of your clone. There Python imports that folder as a namespace package instead of the installed
+   package, and fails with ``ImportError: cannot import name ... from 'myosuite' (unknown location)``, for
+   editable and regular installs alike. Inside the clone, or anywhere else, it works.
+
+Minimal usage
+~~~~~~~~~~~~~
 
 .. code-block:: python
 
-   from myosuite.utils import gym
-   env = gym.make('myoElbowPose1D6MRandom-v0')
-   env.reset()
-   for _ in range(1000):
-     env.mj_render()
-     env.step(env.action_space.sample()) # take a random action
+   from myosuite import make_env
+
+   env = make_env("myoElbowPose1D6MRandom-v0")
+   obs, info = env.reset(seed=0)
+   obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
    env.close()
-
-By default it will activate the simulator and the following visualization is expected:
-
-.. image:: images/test_env.png
-  :width: 300
