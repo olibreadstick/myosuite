@@ -151,3 +151,40 @@ skills:
     frames: [185, 300]
     kind: special
     note: right high kick (ankle to ~1.4 m) stepping forward
+  # --- Forward / backward walking (new) ---
+  run_fwd:
+    clip: punchboxing_running_poses
+    frames: [263, 436]
+    kind: step_fwd
+    note: forward run, ~2.8 m, peak ~2.9 m/s
+  step_back_fast:
+    clip: punchboxing_running_poses
+    frames: [450, 647]
+    kind: step_back
+    note: fast backward walk, ~2.0 m, up to 1.7 m/s
+  walk_back_karate:
+    clip: punchkarate_walkbackwards_poses
+    frames: [272, 479]
+    kind: step_back
+    note: backward walk ~2.1 m; starts rising from a deep crouch, karate arm pose
+  walk_fwd_karate:
+    clip: punchkarate_walkbackwards_poses
+    frames: [500, 726]
+    kind: step_fwd
+    note: forward walk ~2.2 m
+  # --- Balance recovery (new) ---
+  recover_jump_landing:
+    clip: punchboxing_jumpinplace_poses
+    frames: [300, 380]
+    kind: recover
+    note: lands from jump (pelvis peak 1.30 m at frame 280), absorbs to 0.84 m, back upright by ~350
+  recover_kick:
+    clip: punchboxing_kick_poses
+    frames: [270, 350]
+    kind: recover
+    note: after right high kick, pelvis dips to 0.84 m then returns to stance
+  recover_lunge:
+    clip: punchboxing_push_poses
+    frames: [230, 300]
+    kind: recover
+    note: rises from bent-forward lunge (pelvis 0.75 m) back to upright
