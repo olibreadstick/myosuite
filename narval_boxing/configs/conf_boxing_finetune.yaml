@@ -1,0 +1,93 @@
+# Fine-tune the mm-motion-100 MuscleMimic checkpoint on the team's boxing clips.
+# 1 x A100 on Narval. Used with:
+#   python -m fullbody.experiment --config-dir=<this folder> --config-name=conf_boxing_finetune
+#
+# Inherits every network / PPO / reward setting from the preset the checkpoint
+# was trained with, so the checkpoint loads without shape errors. Only the data,
+# the GPU count and the run budget change here.
+defaults:
+  - conf_fullbody_mm_motions_100
+  - _self_
+
+wandb:
+  name: "boxing-finetune-16clips"
+  tags: ["fullbody", "gmr", "boxing", "finetune", "1gpu"]
+  mode: offline   # compute nodes have no internet; sync later from a login node
+
+experiment:
+  # Stable id: resubmitting the same job resumes from its own last checkpoint.
+  run_id: boxing_finetune_16clips_v1
+
+  # Start from the pretrained 100-motion checkpoint (downloaded on the login node).
+  # The job script passes the absolute path with experiment.resume_from=...
+  resume_from: null
+  reset_std_on_resume: 3            # MuscleMimic README recipe for new motions
+  reset_lr_schedule_on_resume: true # restart the LR schedule for this run
+  reset_logging_timestep: true      # W&B x-axis starts at 0 for this run
+
+  # Run budget, counted from the checkpoint (relative). The 10 h wall-time
+  # usually ends the job first; checkpoints every 100 updates (~16 M steps)
+  # mean nothing is lost, and resubmitting continues the run.
+  total_timesteps: 2000000000
+  checkpoint_interval: 100
+  max_checkpoints_to_keep: 5
+
+  # One GPU: 8192 envs = the per-GPU load the checkpoint was trained with
+  # (32768 over 4 GPUs). Lower to 4096 if the job runs out of GPU memory.
+  env_params:
+    num_envs: 8192
+    th_params:
+      # The checkpoint's preset draws 50 % of episode starts from "Q4" (high-intensity,
+      # intensity score >= 2) motions. None of our 16 clips reach that score, so the
+      # trainer refuses to start. 0.0 = pick every clip with equal probability.
+      q4_sampling_fraction: 0.0
+  num_envs: 8192
+  distributed:
+    num_devices: 1
+  trajectory:
+    sharding: none
+
+  task_factory:
+    params:
+      mm_motions_dataset_conf: null
+      amass_dataset_conf:
+        retargeting_method: gmr
+        gmr_cache_namespace: gmr_v6
+        trajectory_cache_type: sparse
+        dataset_group: null
+        # Files live in $CONVERTED_AMASS_PATH/MyoFullBody/gmr_v6/skills/<name>.npz
+        rel_dataset_path:
+          # Cheryl's boxing clips
+          - skills/punch_R_jumpinplace1
+          - skills/punch_L_jumpinplace1
+          - skills/guard
+          # Olivia
+          - skills/kick_R
+          - skills/flurry_kick
+          - skills/lunge_push
+          # Ethan
+          - skills/E1_turn_around_right
+          - skills/E2_turn_around_left
+          - skills/E5_hook_left
+          - skills/E6_hook_right
+          - skills/E19_dodge_left
+          - skills/E19_dodge_left_t2
+          # Deborah (forward walking + balance recovery)
+          - skills/run_fwd
+          - skills/recover_jump_landing
+          - skills/recover_kick
+          - skills/recover_lunge
+
+  # Validate on the same clips (there is no held-out boxing set yet).
+  validation:
+    active: true
+    num: 100                 # validation every ~1% of the budget (~20 M steps)
+    num_envs: 64
+    video_length: 0          # no rendering on the compute node
+    mm_motions_dataset_conf: null
+    amass_dataset_conf:
+      retargeting_method: gmr
+      gmr_cache_namespace: gmr_v6
+      trajectory_cache_type: sparse
+      dataset_group: null
+      rel_dataset_path: ${experiment.task_factory.params.amass_dataset_conf.rel_dataset_path}
